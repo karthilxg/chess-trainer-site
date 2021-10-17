@@ -360,7 +360,7 @@ const fensTheSame = (x, y) => {
   }
 };
 
-const test = true;
+const test = false;
 const debugButtons = true;
 const fetchNewPuzzle = async (maxPly: number) => {
   if (test) {

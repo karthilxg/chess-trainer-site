@@ -5,6 +5,8 @@ COPY yarn.lock ./
 RUN yarn install
 COPY . .
 ENV NODE_ENV=production
+RUN npm set progress=false && \
+  npm install -g exp
 RUN yarn build-web
 
 FROM nginx:latest

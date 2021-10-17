@@ -6,4 +6,6 @@ RUN yarn install
 COPY . .
 ENV NODE_ENV=production
 RUN yarn build-web
-CMD npx serve web-build
+
+FROM nginx:latest
+COPY --from=base web-build /usr/share/nginx/html

@@ -55,10 +55,11 @@ spec:
   rules:
     - host: chessmadra.mbuffett.com
       http: &http_rules
-        - path: "/"
-          pathType: ImplementationSpecific
-          backend:
-            service:
-              name: chess-madra-fe
-              port:
-                number: 80
+        paths:
+          - path: "/"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: chess-madra-fe
+                port:
+                  number: 80

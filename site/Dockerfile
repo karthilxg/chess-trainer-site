@@ -8,4 +8,4 @@ ENV NODE_ENV=production
 RUN yarn build-web
 
 FROM nginx:latest
-COPY --from=base web-build /usr/share/nginx/html
+COPY --from=base /base/web-build /usr/share/nginx/html

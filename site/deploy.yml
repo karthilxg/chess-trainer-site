@@ -28,12 +28,12 @@ spec:
           ports:
             - containerPort: 5000
               name: chess-madra-fe
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 5000
-            initialDelaySeconds: 3
-            periodSeconds: 2
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: 5000
+          #   initialDelaySeconds: 3
+          #   periodSeconds: 2
       imagePullSecrets:
         - name: docker-hub-secret-key
 ---

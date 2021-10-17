@@ -5,4 +5,5 @@ COPY yarn.lock ./
 RUN yarn install
 COPY . .
 ENV NODE_ENV=production
+RUN expo build:web
 CMD npx serve web-build

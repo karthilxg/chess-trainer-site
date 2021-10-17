@@ -1,6 +1,6 @@
 import { assign } from "lodash";
 
-export const c = (...args) => assign({}, ...args);
+export const s = (...args) => assign({}, ...args);
 
 const keyedProp = (key: string) => (x: any) => {
   return {
@@ -47,16 +47,16 @@ const pt = keyedPixelProp("paddingTop");
 const pb = keyedPixelProp("paddingBottom");
 const pl = keyedPixelProp("paddingLeft");
 const pr = keyedPixelProp("paddingRight");
-const px = (x) => c(pl(x), pr(x));
-const py = (x) => c(pt(x), pb(x));
+const px = (x) => s(pl(x), pr(x));
+const py = (x) => s(pt(x), pb(x));
 
 const m = keyedPixelProp("margin");
 const mt = keyedPixelProp("marginTop");
 const mb = keyedPixelProp("marginBottom");
 const ml = keyedPixelProp("marginLeft");
 const mr = keyedPixelProp("marginRight");
-const mx = (x) => c(ml(x), mr(x));
-const my = (x) => c(mt(x), mb(x));
+const mx = (x) => s(ml(x), mr(x));
+const my = (x) => s(mt(x), mb(x));
 
 const weightThin = keyedProp("fontWeight")(300);
 const weightRegular = keyedProp("fontWeight")(400);
@@ -64,7 +64,7 @@ const weightSemiBold = keyedProp("fontWeight")(500);
 const weightBold = keyedProp("fontWeight")(600);
 
 const flexGrow = keyedProp("flexGrow");
-const flexStatic = c(keyedProp("flexGrow")(0), keyedProp("flexShrink")(0));
+const flexStatic = s(keyedProp("flexGrow")(0), keyedProp("flexShrink")(0));
 const unshrinkable = keyedProp("flexShrink")(0);
 const grow = keyedProp("flexGrow")(1);
 const flex = keyedProp("flex");
@@ -79,7 +79,7 @@ const width = keyedPixelProp("width");
 const minWidth = keyedPixelProp("minWidth");
 const minHeight = keyedPixelProp("minHeight");
 const size = (x: string | number) => {
-  return c(height(x), width(x));
+  return s(height(x), width(x));
 };
 
 const selfStart = keyedProp("alignSelf")("flex-start");
@@ -102,8 +102,8 @@ const display = keyedProp("display");
 const displayFlex = keyedProp("display")("flex");
 const displayGrid = keyedProp("display")("grid");
 
-const row = c(displayFlex, keyedProp("flexDirection")("row"));
-const column = c(displayFlex, keyedProp("flexDirection")("column"));
+const row = s(displayFlex, keyedProp("flexDirection")("row"));
+const column = s(displayFlex, keyedProp("flexDirection")("column"));
 const absolute = keyedProp("position")("absolute");
 const relative = keyedProp("position")("relative");
 
@@ -111,7 +111,7 @@ const border = keyedProp("border");
 const borderBottom = keyedProp("borderBottom");
 const borderRight = keyedProp("borderRight");
 
-const center = c(alignCenter, justifyCenter, displayFlex);
+const center = s(alignCenter, justifyCenter, displayFlex);
 
 const br = keyedPixelProp("borderRadius");
 const brtl = keyedPixelProp("borderTopLeftRadius");
@@ -119,15 +119,15 @@ const brtr = keyedPixelProp("borderTopRightRadius");
 const brbl = keyedPixelProp("borderBottomLeftRadius");
 const brbr = keyedPixelProp("borderBottomRightRadius");
 const brl = (x) => {
-  return c(brtl(x), brbl(x));
+  return s(brtl(x), brbl(x));
 };
-const brr = (x) => c(brtr(x), brbr(x));
+const brr = (x) => s(brtr(x), brbr(x));
 const maxWidth = keyedPixelProp("maxWidth");
 const maxHeight = keyedPixelProp("maxHeight");
 const clickable = keyedProp("cursor")("pointer");
 const noBasis = keyedProp("flexBasis")(0);
 const round = keyedPixelProp("borderRadius")(999);
-const flexible = c(
+const flexible = s(
   keyedProp("flexBasis")(0),
   keyedProp("minWidth")(0),
   keyedProp("minHeight")(0)
@@ -144,7 +144,7 @@ const bottom = keyedPixelProp("bottom");
 const top = keyedPixelProp("top");
 
 // Compount style objects
-const dashboardTitle = c(fontSize(40), weightBold, fg("#2e2e3c"));
+const dashboardTitle = s(fontSize(40), weightBold, fg("#2e2e3c"));
 const zIndex = keyedProp("zIndex");
 const overflowHidden = keyedProp("overflow")("hidden");
 const scrollY = keyedProp("overflow-y")("scroll");
@@ -165,7 +165,7 @@ const black = (opacity: number) => {
   return `hsla(0, 0%, 0%, ${opacity}%)`;
 };
 
-export const s = {
+export const c = {
   keyedProp,
   caps,
   p,

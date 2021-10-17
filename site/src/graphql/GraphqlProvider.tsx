@@ -1,13 +1,14 @@
 import React from "react";
 import { MockedProvider } from "@apollo/client/testing";
-import { ApolloProvider } from "@apollo/client";
+import { ApolloProvider, gql } from "@apollo/client";
 
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { repertoiresQueryMock } from "./mocks";
+import Constants from "expo-constants";
 // import { booksQueryMock } from "./mocks";
 
 const client = new ApolloClient({
-  uri: "http://localhost:8000/graphql",
+  uri: `${Constants.manifest.extra.serverUrl}/graphql`,
   cache: new InMemoryCache(),
 });
 

@@ -6,7 +6,7 @@ RUN yarn install
 COPY . .
 ENV NODE_ENV=production
 RUN npm set progress=false && \
-  npm install -g exp
+  npm install -g expo-cli
 RUN yarn build-web
 
 FROM nginx:latest

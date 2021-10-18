@@ -21,7 +21,7 @@ import { c, s } from "@src/styles";
 import useDesign from "@src/design";
 import TopNav from "@src/TopNav";
 import { Space } from "@src/Space";
-// import { ChessboardView } from "@src/chessboard/Chessboard";
+import { ChessboardView } from "@src/chessboard/Chessboard";
 import axios from "axios";
 import { Helmet } from "react-helmet"
 
@@ -106,6 +106,10 @@ export const Home = () => {
         backgroundColor: design.backgroundColor,
       }}
     >
+      <Helmet>
+        <script async src="https://ackee.mbuffett.com/tracker.js" data-ackee-server="https://ackee.mbuffett.com" data-ackee-domain-id="70e91043-cea0-45ab-8b7b-1d3a2297311e"></script>
+      </Helmet>
+      <ChessboardView />
     </Layout>
   );
 };

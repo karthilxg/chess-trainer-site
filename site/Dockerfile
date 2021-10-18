@@ -9,5 +9,5 @@ RUN npm set progress=false && \
   npm install -g expo-cli
 RUN yarn build-web
 
-FROM nginx:latest
-COPY --from=base /base/web-build /usr/share/nginx/html
+FROM joseluisq/static-web-server
+COPY --from=base /base/web-build ./public

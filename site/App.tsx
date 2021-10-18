@@ -9,7 +9,6 @@ import {
 } from "@ui-kitten/components";
 import useDesign from "./src/design";
 import TopNav from "./src/TopNav";
-import { EvaIconsPack } from "@ui-kitten/eva-icons";
 import Space from "./Space";
 import { Pressable, View } from "react-native";
 import { ChessboardView } from "./src/chessboard/Chessboard";
@@ -20,9 +19,6 @@ import {
   useQuery,
   gql,
 } from "@apollo/client";
-import { GraphqlProvider } from "@src/graphql/GraphqlProvider";
-import { GET_COMMUNITY_REPERTOIRES } from "@src/graphql/queries";
-import { GetCommunityRepertoires } from "@src/graphql/__generated__/GetCommunityRepertoires";
 import { api } from "@src/utils/frisbee";
 // import { ExchangeRates } from "@src/ExchangeRate";
 import { s, c } from "@src/styles";
@@ -50,22 +46,19 @@ export default () => (
   <View style={{ backgroundColor: "black" }}>
 
     <>
-      <IconRegistry icons={EvaIconsPack} />
       <ApplicationProvider {...eva} theme={eva.dark}>
-        <GraphqlProvider useMocks>
-          <Layout style={{ backgroundColor: "black" }}>
-            <NavigationContainer linking={linking}>
-              <Home />
-              {/*
+        <Layout style={{ backgroundColor: "black" }}>
+          <NavigationContainer linking={linking}>
+            <Home />
+            {/*
           <Stack.Navigator initialRouteName="Home">
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="AuthSuccess" component={AuthSuccess} />
           </Stack.Navigator>
           */}
-            </NavigationContainer>
-          </Layout>
+          </NavigationContainer>
+        </Layout>
 
-        </GraphqlProvider>
       </ApplicationProvider>
     </>
   </View >

@@ -22,7 +22,7 @@ import QueenWhiteIcon from "@src/chessboard/pieces/QueenWhiteIcon";
 import RookBlackIcon from "@src/chessboard/pieces/RookBlackIcon";
 import RookWhiteIcon from "@src/chessboard/pieces/RookWhiteIcon";
 import { Chess, PieceSymbol } from "@lubert/chess.ts";
-import _ from "lodash";
+import { forEach, isEmpty, cloneDeep, takeRight, first } from "lodash";
 import useDesign from "@src/design";
 import { Button, Text, useTheme } from "@ui-kitten/components";
 import { useImmer } from "use-immer";
@@ -47,8 +47,8 @@ const darkTileColor = c.hsl(180, 15, 40);
 const MoveList = ({ moveList }: { moveList: Move[] }) => {
   let pairs = [];
   let currentPair = [];
-  _.forEach(moveList, (move) => {
-    if (move.color == "b" && _.isEmpty(currentPair)) {
+  forEach(moveList, (move) => {
+    if (move.color == "b" && isEmpty(currentPair)) {
       pairs.push([null, move]);
       return;
     }
@@ -58,7 +58,7 @@ const MoveList = ({ moveList }: { moveList: Move[] }) => {
       currentPair = [];
     }
   });
-  if (!_.isEmpty(currentPair)) {
+  if (!isEmpty(currentPair)) {
     pairs.push(currentPair);
   }
   const design = useDesign();
@@ -340,7 +340,7 @@ const test = false;
 const debugButtons = false;
 const fetchNewPuzzle = async (maxPly: number) => {
   if (test) {
-    return _.cloneDeep(fakePuzzle);
+    return cloneDeep(fakePuzzle);
   }
   try {
     let response = await client.post("/api/v1/tactic", {
@@ -408,7 +408,7 @@ export const ChessboardView = ({ }) => {
         if (fensTheSame(currentPosition.fen(), puzzle.fen)) {
           futurePosition.move(puzzle.moves[0], { sloppy: true });
           currentPosition.move(puzzle.moves[0], { sloppy: true });
-          hiddenMoves = _.takeRight(
+          hiddenMoves = takeRight(
             currentPosition.history({ verbose: true }),
             ply
           );
@@ -420,7 +420,7 @@ export const ChessboardView = ({ }) => {
           console.log(boardForPuzzleMoves.ascii());
           // @ts-ignore
           setSolutionMoves(
-            _.takeRight(
+            takeRight(
               boardForPuzzleMoves.history({ verbose: true }),
               puzzle.moves.length - 1
             )
@@ -548,7 +548,7 @@ export const ChessboardView = ({ }) => {
                                   setSolutionMoves((s) => {
                                     s.shift();
                                     s.shift();
-                                    if (!_.isEmpty(s)) {
+                                    if (!isEmpty(s)) {
                                       setProgressMessage({
                                         message: "Keep going...",
                                         type: ProgressMessageType.Success,
@@ -576,8 +576,8 @@ export const ChessboardView = ({ }) => {
                                 verbose: true,
                               });
                               if (
-                                !_.isEmpty(availableMoves) &&
-                                _.first(availableMoves).from == square
+                                !isEmpty(availableMoves) &&
+                                first(availableMoves).from == square
                               ) {
                                 setAvailableMoves([]);
                               } else {

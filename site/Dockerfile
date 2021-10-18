@@ -9,5 +9,5 @@ RUN npm set progress=false && \
   npm install -g expo-cli
 RUN yarn build-web
 
-FROM joseluisq/static-web-server
+FROM joseluisq/static-web-server:2
 COPY --from=base /base/web-build ./public

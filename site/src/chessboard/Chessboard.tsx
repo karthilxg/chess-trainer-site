@@ -337,7 +337,7 @@ const fensTheSame = (x, y) => {
 };
 
 const test = false;
-const debugButtons = true;
+const debugButtons = false;
 const fetchNewPuzzle = async (maxPly: number) => {
   if (test) {
     return _.cloneDeep(fakePuzzle);

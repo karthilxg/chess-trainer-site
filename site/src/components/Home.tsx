@@ -27,6 +27,7 @@ import TopNav from "@src/TopNav";
 import { Space } from "@src/Space";
 import { ChessboardView } from "@src/chessboard/Chessboard";
 import axios from "axios";
+import { Helmet } from "react-helmet"
 
 interface LichessPuzzle {
   id: string;
@@ -86,18 +87,18 @@ export const Home = () => {
   useEffect(() => {
     if (Platform.OS === 'web') {
       document.body.style.backgroundColor = design.backgroundColor
-      const script = document.createElement('script');
+      //       const script = document.createElement('script');
 
-      script.src = "https://ackee.mbuffett.com/tracker.js";
-      script.async = true;
-      script["data-ackee-server"] = "https://ackee.mbuffett.com"
-      script["data-data-ackee-domain-id"] = "70e91043-cea0-45ab-8b7b-1d3a2297311e"
+      //       script.src = "https://ackee.mbuffett.com/tracker.js";
+      //       script.async = true;
+      //       script.setAttribute("data-ackee-server", "https://ackee.mbuffett.com")
+      //       script.setAttribute("data-data-ackee-domain-id", "70e91043-cea0-45ab-8b7b-1d3a2297311e")
 
-      document.head.appendChild(script);
+      //       document.head.appendChild(script);
 
-      return () => {
-        document.head.removeChild(script);
-      }
+      //       return () => {
+      //         document.head.removeChild(script);
+      //       }
     }
   }, [])
   return (
@@ -109,6 +110,9 @@ export const Home = () => {
         backgroundColor: design.backgroundColor,
       }}
     >
+      <Helmet>
+        <script async src="https://ackee.mbuffett.com/tracker.js" data-ackee-server="https://ackee.mbuffett.com" data-ackee-domain-id="70e91043-cea0-45ab-8b7b-1d3a2297311e"></script>
+      </Helmet>
       <ChessboardView />
     </Layout>
   );

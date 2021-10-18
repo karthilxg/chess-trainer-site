@@ -4,7 +4,7 @@ metadata:
   name: chess-madra-fe
 spec:
   ports:
-    - port: 5000
+    - port: 80
   selector:
     app: chess-madra-fe
 ---
@@ -26,12 +26,12 @@ spec:
         - image: marcusbuffett/chess-madra-fe:latest
           name: chess-madra-fe
           ports:
-            - containerPort: 5000
+            - containerPort: 80
               name: chess-madra-fe
           # readinessProbe:
           #   httpGet:
           #     path: /
-          #     port: 5000
+          #     port: 80
           #   initialDelaySeconds: 3
           #   periodSeconds: 2
       imagePullSecrets:
@@ -62,4 +62,4 @@ spec:
               service:
                 name: chess-madra-fe
                 port:
-                  number: 5000
+                  number: 80

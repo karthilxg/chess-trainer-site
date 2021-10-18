@@ -31,14 +31,15 @@ import client from "@src/client";
 import { Space } from "@src/Space";
 import * as Linking from "expo-linking";
 import { Move } from "chess.js";
+import NumericInput from "react-native-numeric-input";
 
 interface ProgressMessage {
-  message: string,
-  type: ProgressMessageType
+  message: string;
+  type: ProgressMessageType;
 }
 enum ProgressMessageType {
   Error,
-  Success
+  Success,
 }
 
 const lightTileColor = c.hsl(180, 15, 70);
@@ -73,7 +74,6 @@ const MoveList = ({ moveList }: { moveList: Move[] }) => {
         const [whiteMove, blackMove] = pair;
         return (
           <View key={i} style={s(c.column)}>
-
             <View style={s(c.row)}>
               <Text
                 style={s(c.fg(design.textPrimary), c.fontSize(16), c.width(24))}
@@ -84,38 +84,25 @@ const MoveList = ({ moveList }: { moveList: Move[] }) => {
               <Text style={moveStyles}>{whiteMove?.san ?? "..."}</Text>
               <Text style={moveStyles}>{blackMove?.san ?? "..."}</Text>
             </View>
-            {i != (pairs.length - 1) && (
-              <Space height={4} />
-            )}
+            {i != pairs.length - 1 && <Space height={4} />}
           </View>
-
         );
       })}
     </View>
   );
 };
 
-const fakePuzzle: LichessPuzzle =
-{
-  "id": "01MQ3",
-  "moves": [
-    "c8b8",
-    "b7c7",
-    "c4c7",
-    "a5c7"
-  ],
-  "fen": "2r5/1Rb1k3/p3p2p/B5p1/2r1p3/6PP/3R1P2/6K1 b - - 0 37",
-  "popularity": 97,
-  "tags": [
-    "advantage",
-    "endgame",
-    "short"
-  ],
-  "gameLink": "https://lichess.org/p97EKhqM/black#74",
-  "rating": 996,
-  "ratingDeviation": 76,
-  "numberPlays": 1056,
-  "allMoves": [
+const fakePuzzle: LichessPuzzle = {
+  id: "01MQ3",
+  moves: ["c8b8", "b7c7", "c4c7", "a5c7"],
+  fen: "2r5/1Rb1k3/p3p2p/B5p1/2r1p3/6PP/3R1P2/6K1 b - - 0 37",
+  popularity: 97,
+  tags: ["advantage", "endgame", "short"],
+  gameLink: "https://lichess.org/p97EKhqM/black#74",
+  rating: 996,
+  ratingDeviation: 76,
+  numberPlays: 1056,
+  allMoves: [
     "e4",
     "e5",
     "Nf3",
@@ -194,32 +181,21 @@ const fakePuzzle: LichessPuzzle =
     "Rxc7",
     "Bxc7",
     "Rb1+",
-    "Kg2"
+    "Kg2",
   ],
-  "maxPly": 72
+  maxPly: 72,
 };
 const fakeBlackPuzzle: LichessPuzzle = {
-  "id": "005HF",
-  "moves": [
-    "c7g7",
-    "g8g7",
-    "h3g3",
-    "g7h8"
-  ],
-  "fen": "3r1rk1/1pR3pp/p2bp3/1q2Np2/3P4/1P5Q/5PPP/4R1K1 w - - 2 27",
-  "popularity": 65,
-  "tags": [
-    "crushing",
-    "defensiveMove",
-    "hangingPiece",
-    "middlegame",
-    "short"
-  ],
-  "gameLink": "https://lichess.org/IqVPsfjB#53",
-  "rating": 1375,
-  "ratingDeviation": 83,
-  "numberPlays": 37,
-  "allMoves": [
+  id: "005HF",
+  moves: ["c7g7", "g8g7", "h3g3", "g7h8"],
+  fen: "3r1rk1/1pR3pp/p2bp3/1q2Np2/3P4/1P5Q/5PPP/4R1K1 w - - 2 27",
+  popularity: 65,
+  tags: ["crushing", "defensiveMove", "hangingPiece", "middlegame", "short"],
+  gameLink: "https://lichess.org/IqVPsfjB#53",
+  rating: 1375,
+  ratingDeviation: 83,
+  numberPlays: 37,
+  allMoves: [
     "e4",
     "c6",
     "d4",
@@ -290,9 +266,9 @@ const fakeBlackPuzzle: LichessPuzzle = {
     "Qxe1+",
     "Kxe1",
     "Rde8",
-    "Qxe8"
+    "Qxe8",
   ],
-  "maxPly": 52
+  maxPly: 52,
 };
 
 enum ChessPiece {
@@ -381,17 +357,17 @@ export const ChessboardView = ({ }) => {
   let [currentPosition, setCurrentPosition] = useState(new Chess());
   let [futurePosition, setFuturePosition] = useState(new Chess());
   let [availableMoves, setAvailableMoves] = useState([] as Move[]);
-  let [ply, setPly] = useState(4);
+  let [ply, setPly] = useState(2);
   let [hiddenMoves, setHiddenMoves] = useState(null);
   let [solutionMoves, setSolutionMoves] = useImmer([] as Move[]);
-  console.log(solutionMoves)
+  console.log(solutionMoves);
   const design = useDesign();
   const theme = useTheme();
   const ringIndicatorAnim = useRef(new Animated.Value(0)).current;
   const animDuration = 200;
-  const [ringColor, setRingColor] = useState(design.successColor)
+  const [ringColor, setRingColor] = useState(design.successColor);
   const flashRing = (success = true) => {
-    setRingColor(success ? design.successColor : design.failureColor)
+    setRingColor(success ? design.successColor : design.failureColor);
     Animated.sequence([
       Animated.timing(ringIndicatorAnim, {
         toValue: 1,
@@ -411,13 +387,13 @@ export const ChessboardView = ({ }) => {
     (async () => {
       let newPuzzle = await fetchNewPuzzle(ply);
       setPuzzle(newPuzzle);
-      setShowFuturePosition(false)
-      setProgressMessage(null)
+      setShowFuturePosition(false);
+      setProgressMessage(null);
     })();
-  }
+  };
   useEffect(() => {
     if (puzzle === null) {
-      refreshPuzzle()
+      refreshPuzzle();
     }
   }, [puzzle]);
   const [flipped, setFlipped] = useState(false);
@@ -437,16 +413,18 @@ export const ChessboardView = ({ }) => {
             ply
           );
           let boardForPuzzleMoves = futurePosition.clone();
-          boardForPuzzleMoves.undo()
+          boardForPuzzleMoves.undo();
           for (let solutionMove of puzzle.moves) {
             boardForPuzzleMoves.move(solutionMove, { sloppy: true });
           }
-          console.log(boardForPuzzleMoves.ascii())
+          console.log(boardForPuzzleMoves.ascii());
           // @ts-ignore
-          setSolutionMoves(_.takeRight(
-            boardForPuzzleMoves.history({ verbose: true }),
-            puzzle.moves.length - 1
-          ));
+          setSolutionMoves(
+            _.takeRight(
+              boardForPuzzleMoves.history({ verbose: true }),
+              puzzle.moves.length - 1
+            )
+          );
           // currentPosition.undo()
 
           setHiddenMoves(hiddenMoves);
@@ -455,7 +433,7 @@ export const ChessboardView = ({ }) => {
           }
           setCurrentPosition(currentPosition);
           setFuturePosition(futurePosition);
-          setShowFuturePosition(false)
+          setShowFuturePosition(false);
           setFlipped(futurePosition.turn() === "b");
           setAvailableMoves([]);
           break;
@@ -464,9 +442,15 @@ export const ChessboardView = ({ }) => {
     }
   }, [puzzle, ply]);
   const [showFuturePosition, setShowFuturePosition] = useState(false);
-  const [progressMessage, setProgressMessage] = useState((test ? { message: "Test message", type: ProgressMessageType.Error } : null) as ProgressMessage);
+  const [progressMessage, setProgressMessage] = useState(
+    (test
+      ? { message: "Test message", type: ProgressMessageType.Error }
+      : null) as ProgressMessage
+  );
   const { width: windowWidth } = useWindowDimensions();
   const isMobile = windowWidth < 1000;
+  const incrementDecrementStyles = s(c.size(40), c.bg(theme["color-basic-400"]), c.center);
+  const incrementDecrementTextStyles = s(c.fontSize(24), c.weightRegular, c.fg(theme["color-basic-900"]));
   return (
     <View
       style={s(
@@ -478,8 +462,8 @@ export const ChessboardView = ({ }) => {
         isMobile && c.pt(18)
       )}
     >
-      <View style={s(isMobile ? c.column : c.row)}>
-        <View style={s(c.width(500), c.maxWidth("100%"))}>
+      <View style={s(isMobile ? c.column : c.row, isMobile && c.alignStretch)}>
+        <View style={s(c.width(500), c.maxWidth("100%"), c.selfCenter)}>
           <View style={s(c.pb("100%"), c.height(0), c.width("100%"))}>
             <View
               style={{
@@ -565,31 +549,25 @@ export const ChessboardView = ({ }) => {
                                     s.shift();
                                     s.shift();
                                     if (!_.isEmpty(s)) {
-                                      setProgressMessage(
-                                        {
-                                          message: "Keep going...",
-                                          type: ProgressMessageType.Success
-                                        }
-                                      );
+                                      setProgressMessage({
+                                        message: "Keep going...",
+                                        type: ProgressMessageType.Success,
+                                      });
                                     } else {
-                                      setProgressMessage(
-                                        {
-                                          message: "You've completed this puzzle! Hit next puzzle to continue training",
-                                          type: ProgressMessageType.Success
-                                        }
-                                      );
+                                      setProgressMessage({
+                                        message:
+                                          "You've completed this puzzle! Hit next puzzle to continue training",
+                                        type: ProgressMessageType.Success,
+                                      });
                                     }
                                     return s;
                                   });
                                 } else {
-                                  flashRing(false)
-                                  setProgressMessage(
-                                    {
-                                      message:
-                                        `${availableMove.san} was not the right move, try again.`,
-                                      type: ProgressMessageType.Error
-                                    }
-                                  );
+                                  flashRing(false);
+                                  setProgressMessage({
+                                    message: `${availableMove.san} was not the right move, try again.`,
+                                    type: ProgressMessageType.Error,
+                                  });
                                 }
                                 return;
                               }
@@ -648,7 +626,16 @@ export const ChessboardView = ({ }) => {
           {progressMessage && (
             <>
               <View style={s(c.br(4), c.fullWidth)}>
-                <Text style={s(c.fg(progressMessage.type === ProgressMessageType.Error ? design.failureLight : design.successColor), c.weightBold)} >
+                <Text
+                  style={s(
+                    c.fg(
+                      progressMessage.type === ProgressMessageType.Error
+                        ? design.failureLight
+                        : design.successColor
+                    ),
+                    c.weightBold
+                  )}
+                >
                   {progressMessage.message}
                 </Text>
               </View>
@@ -658,7 +645,7 @@ export const ChessboardView = ({ }) => {
           <View style={s()}>
             <Text style={s(c.weightSemiBold)}>
               Visualize the following, then make the best move.
-              </Text>
+            </Text>
             <Space height={12} />
             <Text>
               <MoveList moveList={hiddenMoves} />
@@ -667,11 +654,11 @@ export const ChessboardView = ({ }) => {
           <Space height={24} />
           <Button
             onPress={() => {
-              refreshPuzzle()
+              refreshPuzzle();
             }}
           >
             Next Puzzle
-            </Button>
+          </Button>
           <Space height={12} />
           <Button
             status="basic"
@@ -687,7 +674,36 @@ export const ChessboardView = ({ }) => {
             }}
           >
             View puzzle on lichess
-            </Button>
+          </Button>
+          <Space height={12} />
+          <View style={s(c.row, c.alignCenter, c.selfCenter)}>
+            <Pressable
+              onPress={() => {
+                setPly(Math.max(1, ply - 1));
+              }}
+            >
+              <View style={s(incrementDecrementStyles)}>
+                <Text style={incrementDecrementTextStyles}>-</Text>
+              </View>
+            </Pressable>
+            <Space width={12} />
+            <View style={s(c.column, c.alignCenter, c.width(40))}>
+              <Text style={s(c.fg("white"), c.opacity(80), c.fontSize(12), c.caps, c.weightBold)}>
+                Ply
+              </Text>
+              <Text style={s(c.fg(design.textPrimary), c.fontSize(24), c.weightBold)}>{ply}</Text>
+            </View>
+            <Space width={12} />
+            <Pressable
+              onPress={() => {
+                setPly(ply + 1);
+              }}
+            >
+              <View style={s(incrementDecrementStyles)}>
+                <Text style={incrementDecrementTextStyles}>+</Text>
+              </View>
+            </Pressable>
+          </View>
           {debugButtons && (
             <>
               <Space height={12} />
@@ -698,7 +714,7 @@ export const ChessboardView = ({ }) => {
                 }}
               >
                 Flash ring
-                </Button>
+              </Button>
               <Space height={12} />
               <Button
                 status="basic"
@@ -711,7 +727,7 @@ export const ChessboardView = ({ }) => {
                 }}
               >
                 Advance one move
-                </Button>
+              </Button>
               <Space height={12} />
               <Button
                 status="basic"
@@ -720,16 +736,16 @@ export const ChessboardView = ({ }) => {
                 }}
               >
                 Show future position
-                </Button>
+              </Button>
               <Space height={12} />
               <Button
                 status="basic"
                 onPress={() => {
-                  setPly(ply + 100)
+                  setPly(ply + 100);
                 }}
               >
                 Increment ply
-                </Button>
+              </Button>
             </>
           )}
         </View>

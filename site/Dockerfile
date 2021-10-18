@@ -10,4 +10,5 @@ RUN npm set progress=false && \
 RUN yarn build-web
 
 FROM joseluisq/static-web-server:2
+ENV SERVER_PORT=80
 COPY --from=base /base/web-build ./public

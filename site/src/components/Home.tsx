@@ -86,6 +86,18 @@ export const Home = () => {
   useEffect(() => {
     if (Platform.OS === 'web') {
       document.body.style.backgroundColor = design.backgroundColor
+      const script = document.createElement('script');
+
+      script.src = "https://ackee.mbuffett.com/tracker.js";
+      script.async = true;
+      script["data-ackee-server"] = "https://ackee.mbuffett.com"
+      script["data-data-ackee-domain-id"] = "70e91043-cea0-45ab-8b7b-1d3a2297311e"
+
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+      }
     }
   }, [])
   return (

@@ -82,7 +82,7 @@ export const Home = () => {
   const design = useDesign();
   useEffect(() => {
     if (Platform.OS === 'web') {
-      document.body.style.backgroundColor = design.backgroundColor
+      document.body.style.backgroundColor = "hsl(230, 40%, 11%)"
       //       const script = document.createElement('script');
 
       //       script.src = "https://ackee.mbuffett.com/tracker.js";
@@ -103,7 +103,6 @@ export const Home = () => {
         flex: 1,
         justifyContent: "flex-start",
         alignItems: "center",
-        backgroundColor: design.backgroundColor,
       }}
     >
       <Helmet>

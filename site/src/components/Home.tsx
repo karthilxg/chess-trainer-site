@@ -93,10 +93,10 @@ export const Home = () => {
       script["data-ackee-server"] = "https://ackee.mbuffett.com"
       script["data-data-ackee-domain-id"] = "70e91043-cea0-45ab-8b7b-1d3a2297311e"
 
-      document.body.appendChild(script);
+      document.head.appendChild(script);
 
       return () => {
-        document.body.removeChild(script);
+        document.head.removeChild(script);
       }
     }
   }, [])

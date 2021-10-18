@@ -11,5 +11,6 @@ RUN yarn build-web
 
 FROM joseluisq/static-web-server
 ENV SERVER_PORT=80
+RUN rm -rf ./public
 COPY --from=base /base/web-build ./public
 ENTRYPOINT ["static-web-server"]

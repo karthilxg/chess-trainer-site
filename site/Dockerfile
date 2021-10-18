@@ -10,6 +10,7 @@ RUN npm set progress=false && \
 RUN yarn build-web
 
 FROM nginx:latest
-RUN rm -rf /etc/nginx
-COPY nginx /etc/nginx
+# RUN rm -rf /etc/nginx
+# COPY nginx /etc/nginx
+COPY templates /etc/nginx/templates/
 COPY --from=base /base/web-build /usr/share/nginx/html

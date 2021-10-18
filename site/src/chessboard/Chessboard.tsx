@@ -458,8 +458,8 @@ export const ChessboardView = ({ }) => {
         !isMobile && c.center,
         !isMobile && c.minWidth("100vw"),
         !isMobile && c.minHeight("100vh"),
-        isMobile && c.px(18),
-        isMobile && c.pt(18)
+        isMobile && c.px(10),
+        isMobile && c.pt(10)
       )}
     >
       <View style={s(isMobile ? c.column : c.row, isMobile && c.alignStretch)}>
@@ -610,7 +610,7 @@ export const ChessboardView = ({ }) => {
                                     )}
                                   />
                                 ))}
-                            <View>{pieceView}</View>
+                            <View style={s(c.fullWidth)}>{pieceView}</View>
                           </Pressable>
                         );
                       })}

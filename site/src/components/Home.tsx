@@ -81,8 +81,13 @@ export const Home = () => {
   // } = useQuery<GetCommunityRepertoires>(GET_COMMUNITY_REPERTOIRES);
   const design = useDesign();
   useEffect(() => {
+    setTimeout(() => {
+      document.title = "chessmadra"
+    }, 100)
+  })
+  useEffect(() => {
     if (Platform.OS === 'web') {
-      document.body.style.backgroundColor = "hsl(230, 40%, 11%)"
+      document.body.style.backgroundColor = "hsl(230, 40%, 4%)"
       //       const script = document.createElement('script');
 
       //       script.src = "https://ackee.mbuffett.com/tracker.js";
@@ -103,6 +108,7 @@ export const Home = () => {
         flex: 1,
         justifyContent: "flex-start",
         alignItems: "center",
+        backgroundColor: "none"
       }}
     >
       <Helmet>

@@ -1,11 +1,10 @@
 import dotenv from 'dotenv'
 import path from "path"
 dotenv.config({ path: path.resolve(__dirname, '../.env') })
-console.log("DJSU: ", process.env.DOJO_SERVER_URL)
 
 
 export default {
-  "name": "chess-dojo",
+  "name": "chessmadra",
   "slug": "chess-dojo",
   "version": "1.0.0",
   "orientation": "portrait",

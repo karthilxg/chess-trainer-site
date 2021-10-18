@@ -40,15 +40,15 @@ const linking = {
 };
 
 
-const Stack = createNativeStackNavigator();
+// const Stack = createNativeStackNavigator();
 
 export default () => (
-  <View style={{ backgroundColor: "black" }}>
+  <View nativeID="Blah">
 
     <>
       <ApplicationProvider {...eva} theme={eva.dark}>
-        <Layout style={{ backgroundColor: "black" }}>
-          <NavigationContainer linking={linking}>
+        <Layout style={s(c.bg("none"))} >
+          // <NavigationContainer linking={linking}>
             <Home />
             {/*
           <Stack.Navigator initialRouteName="Home">
@@ -56,7 +56,7 @@ export default () => (
             <Stack.Screen name="AuthSuccess" component={AuthSuccess} />
           </Stack.Navigator>
           */}
-          </NavigationContainer>
+          // </NavigationContainer>
         </Layout>
 
       </ApplicationProvider>

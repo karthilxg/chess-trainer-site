@@ -9,7 +9,7 @@ RUN npm set progress=false && \
   npm install -g expo-cli
 RUN yarn build-web
 
-FROM joseluisq/static-web-server
+FROM joseluisq/static-web-server:2-alpine
 ENV SERVER_PORT=80
 RUN rm -rf ./public
 COPY --from=base /base/web-build ./public

@@ -644,7 +644,7 @@ export const ChessboardView = ({ }) => {
           )}
           <View style={s()}>
             <Text style={s(c.weightSemiBold)}>
-              Visualize the following, then make the best move.
+              {futurePosition.turn() == "b" ? "Black" : "White"} to move. Visualize the following, then make the best move.
             </Text>
             <Space height={12} />
             <Text>

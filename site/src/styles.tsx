@@ -19,7 +19,7 @@ const keyedPixelProp = (key: string) => (x: any) => {
   };
 };
 
-const keyedPercentProp = (key: string) => (x: number | string) => {
+const keyedPercentProp = (key: string) => (x: number | string | any) => {
   if (typeof x === "number") {
     return {
       [key]: `${x}%`,
@@ -32,7 +32,7 @@ const keyedPercentProp = (key: string) => (x: number | string) => {
 
 const hsl = (h: number, s: number, l: number, a?: number) => {
   if (a) {
-    return `hsla(${h}, ${s}%, ${l}%, ${a}%)`;
+    return `hsla(${h}, ${s}%, ${l}%, ${a / 100})`;
   } else {
     return `hsl(${h}, ${s}%, ${l}%)`;
   }

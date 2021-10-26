@@ -49,9 +49,10 @@ metadata:
 spec:
   ingressClassName: kong
   tls:
-    - secretName: chess-madra-fe-tls-v3
+    - secretName: chess-madra-fe-tls-v5
       hosts:
         - chessmadra.mbuffett.com
+        - chessmadra.com
   rules:
     - host: chessmadra.mbuffett.com
       http: &http_rules
@@ -63,3 +64,5 @@ spec:
                 name: chess-madra-fe
                 port:
                   number: 80
+    - host: chessmadra.com
+      http: *http_rules

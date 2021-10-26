@@ -62,6 +62,8 @@ const weightThin = keyedProp("fontWeight")(300);
 const weightRegular = keyedProp("fontWeight")(400);
 const weightSemiBold = keyedProp("fontWeight")(500);
 const weightBold = keyedProp("fontWeight")(600);
+const weightHeavy = keyedProp("fontWeight")(700);
+const weightBlack = keyedProp("fontWeight")(800);
 
 const flexGrow = keyedProp("flexGrow");
 const flexStatic = s(keyedProp("flexGrow")(0), keyedProp("flexShrink")(0));
@@ -165,6 +167,51 @@ const black = (opacity: number) => {
   return `hsla(0, 0%, 0%, ${opacity}%)`;
 };
 
+const colors = {
+  textPrimary: "hsl(0, 0%, 100%)",
+  textInverse: "hsl(225, 37%, 16%)",
+  textAlternate: "hsl(220, 29%, 83%)",
+  successColor: "hsl(164, 98%, 35%)",
+  failureColor: "hsl(340, 70%, 52%)",
+  failureLight: "hsl(348, 100%, 72%)",
+  buttonPrimary: "hsl(181, 45%, 40%)",
+  buttonSecondary: "hsl(215, 35%, 95%)",
+  backgroundColor: "hsl(229, 39%, 10%)",
+  backgroundColorSecondary: "hsl(224, 34%, 20%)",
+};
+
+const basicButtonStyles = s(
+  br(2),
+  py(16),
+  px(16),
+  bg(colors.buttonSecondary),
+  clickable,
+  center,
+  {
+    textStyles: s(weightBold, fontSize(16), fg(colors.textInverse)),
+  }
+);
+const disabledButtonStyles = s(
+  br(2),
+  py(16),
+  px(16),
+  bg(hsl(215, 38, 45)),
+  opacity(20),
+  clickable,
+  center,
+  {
+    textStyles: s(weightBold, fontSize(16), fg("white")),
+  }
+);
+const primaryButtonStyles = s(basicButtonStyles, bg(colors.buttonPrimary), {
+  textStyles: s(weightBold, fg(colors.textPrimary), fontSize(16)),
+});
+const buttons = {
+  basic: basicButtonStyles,
+  disabled: disabledButtonStyles,
+  primary: primaryButtonStyles,
+};
+
 export const c = {
   keyedProp,
   caps,
@@ -181,11 +228,14 @@ export const c = {
   ml,
   mr,
   mx,
+  colors,
   my,
   weightThin,
   weightRegular,
   weightSemiBold,
   weightBold,
+  weightHeavy,
+  weightBlack,
   flexGrow,
   flexStatic,
   unshrinkable,
@@ -270,4 +320,5 @@ export const c = {
   },
   white,
   black,
+  buttons,
 };

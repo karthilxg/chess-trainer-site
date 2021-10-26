@@ -1,5 +1,7 @@
+import { Move } from "@lubert/chess.ts";
+
 export interface ChessboardBiref {
-  setAvailableMoves?: (_: Move[]) => void;
-  flashRing?: (_?: boolean) => void;
-  highlightMove?: (_: Move, _: () => void) => void;
+  setAvailableMoves?: (m: Move[]) => void;
+  flashRing?: (success?: boolean) => void;
+  highlightMove?: (move: Move, backwards?: boolean, cb?: () => void) => void;
 }

@@ -40,16 +40,12 @@ import {
   isEqual,
   indexOf,
 } from "lodash";
-import useDesign from "@src/design";
-import { Button, Text, useTheme } from "@ui-kitten/components";
 import { useImmer } from "use-immer";
 import { LichessPuzzle } from "@src/models";
 import client from "@src/client";
 import { Space } from "@src/Space";
 import * as Linking from "expo-linking";
-import { Move } from "chess.js";
-import NumericInput from "react-native-numeric-input";
-import { Square } from "@lubert/chess.ts/dist/types";
+import { Move, Square } from "@lubert/chess.ts/dist/types";
 import { ChessboardBiref } from "@src/types/ChessboardBiref";
 import { useEffectWithPrevious } from "@src/utils/useEffectWithPrevious";
 import { useComponentLayout } from "@src/utils/useComponentLayout";
@@ -131,12 +127,12 @@ export const ChessboardView = ({
   showFuturePosition;
   biref: ChessboardBiref;
 }) => {
+  // @ts-ignore
   let [{ height: chessboardSize }, onChessboardLayout] = useComponentLayout();
   chessboardSize = chessboardSize ?? 500; // just for first render
   const tileStyles = s(c.bg("green"), c.grow);
   let [availableMoves, setAvailableMoves] = useState([] as Move[]);
   biref.setAvailableMoves = setAvailableMoves;
-  console.log("flipped", flipped);
 
   const getSquareOffset = useCallback(
     (square: string) => {
@@ -144,11 +140,9 @@ export const ChessboardView = ({
       let x = indexOf(columns, file);
       let y = 7 - indexOf(rows, parseInt(rank));
       if (flipped) {
-        console.log("Is flipped");
         x = 7 - x;
         y = 7 - y;
       }
-      console.log(x, y);
       return { x: (x / 8) * chessboardSize, y: (y / 8) * chessboardSize };
     },
     [chessboardSize, flipped]
@@ -157,11 +151,16 @@ export const ChessboardView = ({
   const [moveIndicatorColor, setMoveIndicatorColor] = useState(null);
   const moveIndicatorOpacityAnim = useRef(new Animated.Value(0)).current;
   biref.highlightMove = useCallback(
-    (move: Move, callback: () => void) => {
+    (move: Move, backwards = false, callback: () => void) => {
       let moveDuration = 200;
       let fadeDuration = 200;
-      setMoveIndicatorColor(move.color == "b" ? c.hsl(180, 15, 0, 60) : c.hsl(180, 15, 100, 60))
-      moveAnim.setValue(getSquareOffset(move.from));
+      setMoveIndicatorColor(
+        move.color == "b" ? c.hsl(180, 15, 0, 60) : c.hsl(180, 15, 100, 60)
+      );
+      let [start, end] = backwards
+        ? [move.to, move.from]
+        : [move.from, move.to];
+      moveAnim.setValue(getSquareOffset(start));
       Animated.sequence([
         Animated.timing(moveIndicatorOpacityAnim, {
           toValue: 1.0,
@@ -170,7 +169,7 @@ export const ChessboardView = ({
           easing: Easing.inOut(Easing.ease),
         }),
         Animated.timing(moveAnim, {
-          toValue: getSquareOffset(move.to),
+          toValue: getSquareOffset(end),
           duration: moveDuration,
           useNativeDriver: false,
           easing: Easing.inOut(Easing.ease),
@@ -192,10 +191,7 @@ export const ChessboardView = ({
     });
   }, []);
 
-  const design = useDesign();
-  const theme = useTheme();
   const ringIndicatorAnim = useRef(new Animated.Value(0)).current;
-  console.log(ringIndicatorAnim);
   const animDuration = 200;
   const [highlightedSquares, setHighlightedSquares] = useImmer([] as Square[]);
   useEffectWithPrevious(
@@ -218,9 +214,9 @@ export const ChessboardView = ({
     },
     [highlightedSquares]
   );
-  const [ringColor, setRingColor] = useState(design.successColor);
+  const [ringColor, setRingColor] = useState(c.colors.successColor);
   const flashRing = (success = true) => {
-    setRingColor(success ? design.successColor : design.failureColor);
+    setRingColor(success ? c.colors.successColor : c.colors.failureColor);
     Animated.sequence([
       Animated.timing(ringIndicatorAnim, {
         toValue: 1,
@@ -247,6 +243,7 @@ export const ChessboardView = ({
   return (
     <View
       style={s(c.pb("100%"), c.height(0), c.width("100%"))}
+      // @ts-ignore
       onLayout={onChessboardLayout}
     >
       <View
@@ -259,7 +256,7 @@ export const ChessboardView = ({
           shadowColor: "black",
           shadowOpacity: 0.4,
           shadowRadius: 10,
-          backgroundColor: design.backgroundColorSecondary,
+          backgroundColor: c.colors.backgroundColorSecondary,
         }}
       >
         <Animated.View
@@ -275,7 +272,7 @@ export const ChessboardView = ({
           )}
         >
           <View
-            style={s(c.size("40%"), c.round, c.bg(moveIndicatorColor))}
+            style={s(c.size("50%"), c.round, c.bg(moveIndicatorColor))}
           ></View>
         </Animated.View>
         <Animated.View // Special animatable View
@@ -309,9 +306,6 @@ export const ChessboardView = ({
                     : currentPosition;
                   let piece = position.get(square);
                   let pieceView = null;
-                  if (square == "a1") {
-                    console.log("square", squareHighlightAnims[square]);
-                  }
                   if (piece) {
                     pieceView = (
                       <PieceView piece={piece["type"]} color={piece["color"]} />

@@ -25,7 +25,6 @@ function SvgComponent(props) {
       <Path
         d="M19.32 14.694c-.776.86-.69 1.116-.814 2.15.806.123 1.507.24 2.249.066 2.38-1.262.075-3.403-1.435-2.216z"
         opacity={0.35}
-        paintOrder="fill markers stroke"
       />
       <Path
         d="M9.192 22.166c-.85.408-.999.96-1.057 1.475.729.419 1.877-.125 2.041-1.431l-.984-.044z"
@@ -63,4 +62,3 @@ function SvgComponent(props) {
 }
 
 export default SvgComponent;
-

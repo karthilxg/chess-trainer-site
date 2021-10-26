@@ -1,26 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
-  ApplicationProvider,
-  IconRegistry,
-  Button,
-  Layout,
   Text,
-  useTheme,
-} from "@ui-kitten/components";
-// import { EvaIconsPack } from "@ui-kitten/eva-icons";
-import { Platform, Pressable, useWindowDimensions, View } from "react-native";
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  useQuery,
-  gql,
-} from "@apollo/client";
-import { api } from "@src/utils/frisbee";
+  Platform,
+  Pressable,
+  useWindowDimensions,
+  View,
+} from "react-native";
 // import { ExchangeRates } from "@src/ExchangeRate";
 import { c, s } from "@src/styles";
-import useDesign from "@src/design";
-import TopNav from "@src/TopNav";
 import { Space } from "@src/Space";
 import { ChessboardView } from "@src/chessboard/Chessboard";
 import axios from "axios";
@@ -28,12 +15,14 @@ import { Helmet } from "react-helmet";
 import { useImmer } from "use-immer";
 import { Chess, Move } from "@lubert/chess.ts";
 import client from "@src/client";
-import { cloneDeep, isEmpty, takeRight } from "lodash";
+import { cloneDeep, isEmpty, isNil, takeRight } from "lodash";
 import { MoveList } from "./MoveList";
 import { LichessPuzzle } from "@src/models";
 import { ChessboardBiref } from "@src/types/ChessboardBiref";
 // import { Feather } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { Button } from "./Button";
+import useState from "react-usestateref";
 
 const fakePuzzle: LichessPuzzle = {
   id: "01MQ3",
@@ -223,9 +212,9 @@ enum ProgressMessageType {
   Success,
 }
 
-const test = true;
+const test = false;
 const testProgress = false;
-const debugButtons = true;
+const debugButtons = false;
 
 const fensTheSame = (x, y) => {
   if (x.split(" ")[0] == y.split(" ")[0]) {
@@ -248,13 +237,6 @@ const fetchNewPuzzle = async (maxPly: number): Promise<LichessPuzzle> => {
 };
 
 export const VisualizationTraining = () => {
-  const theme = useTheme();
-  // const {
-  //   data: repertoires,
-  //   loading,
-  //   error,
-  // } = useQuery<GetCommunityRepertoires>(GET_COMMUNITY_REPERTOIRES);
-  const design = useDesign();
   const { width: windowWidth } = useWindowDimensions();
   const isMobile = windowWidth < 1000;
   useEffect(() => {
@@ -272,11 +254,7 @@ export const VisualizationTraining = () => {
       ? { message: "Test message", type: ProgressMessageType.Error }
       : null) as ProgressMessage
   );
-  const incrementDecrementStyles = s(
-    c.size(40),
-    c.bg(theme["color-basic-400"]),
-    c.center
-  );
+  const incrementDecrementStyles = s(c.buttons.basic, c.size(40));
   let [currentPosition, setCurrentPosition] = useState(new Chess());
   let [futurePosition, setFuturePosition] = useState(new Chess());
   let [ply, setPly] = useState(6);
@@ -292,32 +270,62 @@ export const VisualizationTraining = () => {
       setProgressMessage(null);
     })();
   };
-  const incrementDecrementTextStyles = s(
-    c.fontSize(24),
-    c.weightRegular,
-    c.fg(theme["color-basic-900"])
-  );
+  const incrementDecrementTextStyles = s(c.fontSize(24), c.weightRegular);
   useEffect(() => {
     if (puzzle === null) {
       refreshPuzzle();
     }
   }, [puzzle]);
-  const [isPlaying, setIsPlaying] = useState(false);
+  // TODO: helper to make state and ref
+  const [isPlaying, setIsPlaying, isPlayingRef] = useState(false);
+  const [focusedMoveIndex, setFocusedMoveIndex] = useState(null);
+  const focusedMove = !isNil(focusedMoveIndex) && hiddenMoves[focusedMoveIndex];
+  const focusOnMove = (i, cb, backwards = false) => {
+    biref.highlightMove(hiddenMoves[i], backwards, () => {
+      if (cb) {
+        cb();
+      }
+    });
+    setFocusedMoveIndex(i);
+  };
+  const focusLastMove = () => {
+    if (!isNil(focusedMoveIndex)) {
+      biref.highlightMove(hiddenMoves[focusedMoveIndex], true, () => {});
+      let i = focusedMoveIndex - 1;
+      if (i == -1) {
+        setFocusedMoveIndex(null);
+      } else {
+        setFocusedMoveIndex(i);
+      }
+    }
+  };
+  const focusNextMove = () => {
+    if (focusedMoveIndex != hiddenMoves.length - 1) {
+      let i = isNil(focusedMoveIndex) ? 0 : focusedMoveIndex + 1;
+      focusOnMove(i, null, false);
+    }
+  };
   const animateMoves = useCallback(() => {
+    if (isPlaying) {
+      setIsPlaying(false);
+      return;
+    }
     setIsPlaying(true);
     let moves = cloneDeep(hiddenMoves);
+    let i = 0;
     let animateNextMove = () => {
       let move = moves.shift();
-      if (move) {
-        biref.highlightMove(move, () => {
+      if (move && isPlayingRef.current) {
+        focusOnMove(i, () => {
           animateNextMove();
         });
+        i++;
       } else {
         setIsPlaying(false);
       }
     };
     animateNextMove();
-  }, [hiddenMoves]);
+  }, [hiddenMoves, isPlaying]);
 
   const attemptSolution = useCallback(
     (move: Move) => {
@@ -358,6 +366,7 @@ export const VisualizationTraining = () => {
   }, []);
   useEffect(() => {
     if (puzzle) {
+      setFocusedMoveIndex(null);
       let currentPosition = new Chess();
       let futurePosition = new Chess();
       for (let move of puzzle.allMoves) {
@@ -399,18 +408,51 @@ export const VisualizationTraining = () => {
     }
   }, [puzzle, ply]);
   const [showFuturePosition, setShowFuturePosition] = useState(false);
-  const nextPreviousStyles = s(
-    c.width(70),
-    c.center,
-    c.bg(theme["color-basic-100"]),
-    c.border("none")
-  );
+  const nextPreviousStyles = s(c.size(60), c.buttons.basic);
+  const disabledNextPreviousStyles = s(c.buttons.disabled);
   const nextPreviousIconProps = {
-    style: s(c.fg(theme["color-basic-900"])),
-    size: 24,
+    style: s(c.fg(c.colors.textInverse)),
+    size: 28,
   };
+  const player = (
+    <>
+      <View style={s(c.row, c.alignStretch, c.fullWidth)}>
+        <Button
+          style={s(nextPreviousStyles)}
+          onPress={() => {
+            focusLastMove();
+          }}
+        >
+          <Text>
+            <Icon name="chevron-left" {...nextPreviousIconProps} />
+          </Text>
+        </Button>
+        <Button
+          style={s(c.grow, c.mx(20), c.buttons.primary, c.py(0))}
+          onPress={animateMoves}
+        >
+          <Icon
+            name={isPlaying ? "pause" : "play-arrow"}
+            size={34}
+            color="white"
+          />
+        </Button>
+        <Button
+          style={s(nextPreviousStyles)}
+          onPress={() => {
+            focusNextMove();
+          }}
+        >
+          <Text>
+            <Icon name="chevron-right" {...nextPreviousIconProps} />
+          </Text>
+        </Button>
+      </View>
+      <Space height={12} />
+    </>
+  );
   return (
-    <Layout
+    <View
       style={{
         flex: 1,
         justifyContent: "flex-start",
@@ -429,9 +471,12 @@ export const VisualizationTraining = () => {
         )}
       >
         <View
-          style={s(isMobile ? c.column : c.row, isMobile && s(c.alignCenter))}
+          style={s(
+            isMobile && s(c.alignCenter),
+            isMobile ? c.column : s(c.row, c.alignStart)
+          )}
         >
-          <View style={s(c.width(500), c.maxWidth("100%"), c.selfCenter)}>
+          <View style={s(c.width(500), c.maxWidth("100%"))}>
             <ChessboardView
               {...{
                 attemptSolution,
@@ -442,93 +487,66 @@ export const VisualizationTraining = () => {
                 showFuturePosition,
               }}
             />
-            <Space height={12} width={12} isMobile={isMobile} />
-            <View style={s(c.column, c.maxWidth(500))}>
-              {progressMessage && (
-                <>
-                  <View style={s(c.br(4), c.fullWidth)}>
-                    <Text
-                      style={s(
-                        c.fg(
-                          progressMessage.type === ProgressMessageType.Error
-                            ? design.failureLight
-                            : design.successColor
-                        ),
-                        c.weightBold
-                      )}
-                    >
-                      {progressMessage.message}
-                    </Text>
-                  </View>
-                  <Space height={12} />
-                </>
-              )}
-              {!showFuturePosition && (
-                <>
-                  <View style={s(c.row, c.alignStretch, c.fullWidth)}>
-                    <Button
-                      style={s(nextPreviousStyles)}
-                      onPress={() => {
-                        focusLastMove();
-                      }}
-                    >
-                      <Text>
-                        <Icon name="chevron-left" {...nextPreviousIconProps} />
-                      </Text>
-                    </Button>
-                    <Button
-                      style={s(
-                        c.grow,
-                        c.mx(20),
-                        c.px(20),
-                        c.bg(theme["color-primary-500"])
-                      )}
-                      onPress={animateMoves}
-                    >
-                      <Text>
-                        <Icon name="play-arrow" size={32} />
-                      </Text>
-                    </Button>
-                    <Button
-                      style={s(nextPreviousStyles)}
-                      onPress={() => {
-                        focusNextMove();
-                      }}
-                    >
-                      <Text>
-                        <Icon name="chevron-right" {...nextPreviousIconProps} />
-                      </Text>
-                    </Button>
-                  </View>
-                  <Space height={12} />
-                </>
-              )}
-              <View style={s()}>
-                <Text style={s(c.weightSemiBold)}>
-                  {futurePosition.turn() == "b" ? "Black" : "White"} to move.
-                  Visualize the following, then make the best move.
-                </Text>
+          </View>
+          <Space height={12} width={12} isMobile={isMobile} />
+          <View style={s(c.column, c.maxWidth(500), c.fullWidth)}>
+            {progressMessage && (
+              <>
+                <View style={s(c.br(4), c.fullWidth)}>
+                  <Text
+                    style={s(
+                      c.fg(
+                        progressMessage.type === ProgressMessageType.Error
+                          ? c.colors.failureLight
+                          : c.colors.successColor
+                      ),
+                      c.weightBold
+                    )}
+                  >
+                    {progressMessage.message}
+                  </Text>
+                </View>
                 <Space height={12} />
-                <Text>
-                  <MoveList
-                    moveList={hiddenMoves}
-                    onMoveClick={(move) => {
-                      biref.highlightMove(move);
-                    }}
-                  />
-                </Text>
-              </View>
-              <Space height={24} />
+              </>
+            )}
+            {!showFuturePosition && isMobile && player}
+            <View style={s()}>
+              <Text
+                style={s(
+                  c.weightSemiBold,
+                  c.fg(c.colors.textPrimary),
+                  c.fontSize(16)
+                )}
+              >
+                {futurePosition.turn() == "b" ? "Black" : "White"} to move.
+                Visualize the following, or press play, then make the best move.
+              </Text>
+              <Space height={12} />
+              <Text>
+                <MoveList
+                  focusedMoveIndex={focusedMoveIndex}
+                  moveList={hiddenMoves}
+                  onMoveClick={(move, i) => {
+                    setFocusedMoveIndex(i);
+                    biref.highlightMove(move);
+                  }}
+                />
+              </Text>
+            </View>
+            <Space height={24} />
+            {!showFuturePosition && !isMobile && player}
+            <View style={s(c.row, c.fullWidth)}>
               <Button
+                style={s(c.buttons.basic, c.noBasis, c.grow)}
                 onPress={() => {
                   refreshPuzzle();
                 }}
               >
                 Next Puzzle
               </Button>
-              <Space height={12} />
+              <Space height={12} width={12} isMobile={isMobile} />
               <Button
-                status="basic"
+                style={s(c.buttons.basic, c.noBasis, c.grow)}
                 onPress={() => {
                   (async () => {
                     if (Platform.OS == "web") {
@@ -540,101 +558,101 @@ export const VisualizationTraining = () => {
                   })();
                 }}
               >
-                View puzzle on lichess
+                View on lichess
               </Button>
-              <Space height={12} />
-              <View style={s(c.row, c.alignCenter, c.selfCenter)}>
-                <Pressable
-                  onPress={() => {
-                    setPly(Math.max(1, ply - 1));
-                  }}
-                >
-                  <View style={s(incrementDecrementStyles)}>
-                    <Text style={incrementDecrementTextStyles}>-</Text>
-                  </View>
-                </Pressable>
-                <Space width={12} />
-                <View style={s(c.column, c.alignCenter, c.width(40))}>
-                  <Text
-                    style={s(
-                      c.fg("white"),
-                      c.opacity(80),
-                      c.fontSize(12),
-                      c.caps,
-                      c.weightBold
-                    )}
-                  >
-                    Ply
-                  </Text>
-                  <Text
-                    style={s(
-                      c.fg(design.textPrimary),
-                      c.fontSize(24),
-                      c.weightBold
-                    )}
-                  >
-                    {ply}
-                  </Text>
-                </View>
-                <Space width={12} />
-                <Pressable
-                  onPress={() => {
-                    setPly(ply + 1);
-                  }}
-                >
-                  <View style={s(incrementDecrementStyles)}>
-                    <Text style={incrementDecrementTextStyles}>+</Text>
-                  </View>
-                </Pressable>
-              </View>
-              {debugButtons && (
-                <>
-                  <Space height={12} />
-                  <Button
-                    status="basic"
-                    onPress={() => {
-                      biref.flashRing();
-                    }}
-                  >
-                    Flash ring
-                  </Button>
-                  <Space height={12} />
-                  <Button
-                    status="basic"
-                    onPress={() => {
-                      currentPosition.move(hiddenMoves[0]);
-                      setHiddenMoves((s) => {
-                        s.shift();
-                        return s;
-                      });
-                    }}
-                  >
-                    Advance one move
-                  </Button>
-                  <Space height={12} />
-                  <Button
-                    status="basic"
-                    onPress={() => {
-                      setShowFuturePosition(true);
-                    }}
-                  >
-                    Show future position
-                  </Button>
-                  <Space height={12} />
-                  <Button
-                    status="basic"
-                    onPress={() => {
-                      setPly(ply + 100);
-                    }}
-                  >
-                    Increment ply
-                  </Button>
-                </>
-              )}
             </View>
+            <Space height={12} />
+            <View style={s(c.row, c.alignCenter, c.selfCenter)}>
+              <Pressable
+                onPress={() => {
+                  setPly(Math.max(1, ply - 1));
+                }}
+              >
+                <View style={s(incrementDecrementStyles)}>
+                  <Text style={incrementDecrementTextStyles}>-</Text>
+                </View>
+              </Pressable>
+              <Space width={12} />
+              <View style={s(c.column, c.alignCenter, c.width(40))}>
+                <Text
+                  style={s(
+                    c.fg("white"),
+                    c.opacity(80),
+                    c.fontSize(12),
+                    c.caps,
+                    c.weightBold
+                  )}
+                >
+                  Ply
+                </Text>
+                <Text
+                  style={s(
+                    c.fg(c.colors.textPrimary),
+                    c.fontSize(24),
+                    c.weightBold
+                  )}
+                >
+                  {ply}
+                </Text>
+              </View>
+              <Space width={12} />
+              <Pressable
+                onPress={() => {
+                  setPly(ply + 1);
+                }}
+              >
+                <View style={s(incrementDecrementStyles)}>
+                  <Text style={incrementDecrementTextStyles}>+</Text>
+                </View>
+              </Pressable>
+            </View>
+            {debugButtons && (
+              <>
+                <Space height={12} />
+                <Button
+                  style={c.buttons.basic}
+                  onPress={() => {
+                    biref.flashRing();
+                  }}
+                >
+                  Flash ring
+                </Button>
+                <Space height={12} />
+                <Button
+                  style={c.buttons.basic}
+                  onPress={() => {
+                    currentPosition.move(hiddenMoves[0]);
+                    setHiddenMoves((s) => {
+                      s.shift();
+                      return s;
+                    });
+                  }}
+                >
+                  Advance one move
+                </Button>
+                <Space height={12} />
+                <Button
+                  style={c.buttons.basic}
+                  onPress={() => {
+                    setShowFuturePosition(true);
+                  }}
+                >
+                  Show future position
+                </Button>
+                <Space height={12} />
+                <Button
+                  style={c.buttons.basic}
+                  onPress={() => {
+                    setPly(ply + 100);
+                  }}
+                >
+                  Increment ply
+                </Button>
+              </>
+            )}
           </View>
         </View>
       </View>
-    </Layout>
+    </View>
   );
 };

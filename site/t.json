@@ -1,102 +1,466 @@
 {
-  "id": "01MQ3",
-  "moves": [
-    "c8b8",
-    "b7c7",
-    "c4c7",
-    "a5c7"
-  ],
-  "fen": "2r5/1Rb1k3/p3p2p/B5p1/2r1p3/6PP/3R1P2/6K1 b - - 0 37",
-  "popularity": 97,
-  "tags": [
-    "advantage",
-    "endgame",
-    "short"
-  ],
-  "game_link": "https://lichess.org/p97EKhqM/black#74",
-  "rating": 996,
-  "rating_deviation": 76,
-  "number_plays": 1056,
-  "all_moves": [
-    "e4",
-    "e5",
-    "Nf3",
-    "Nc6",
-    "Bc4",
-    "h6",
-    "d4",
-    "d6",
-    "dxe5",
-    "Nxe5",
-    "Nxe5",
-    "dxe5",
-    "Qxd8+",
-    "Kxd8",
-    "O-O",
-    "Nf6",
-    "Nc3",
-    "Be6",
-    "Bxe6",
-    "fxe6",
-    "a3",
-    "a6",
-    "Be3",
-    "b5",
-    "Rad1+",
-    "Ke8",
-    "h3",
-    "b4",
-    "Ne2",
-    "bxa3",
-    "bxa3",
-    "Bxa3",
-    "Rd3",
-    "Be7",
-    "Rfd1",
-    "Nxe4",
-    "Nc3",
-    "Nxc3",
-    "Rxc3",
-    "Bd6",
-    "Bc5",
-    "Kd7",
-    "Ba3",
-    "Rhc8",
-    "Re3",
-    "Ke7",
-    "Ra1",
-    "Kf7",
-    "c4",
-    "c5",
-    "Rd1",
-    "Rd8",
-    "Red3",
-    "Ke7",
-    "Rg3",
-    "g5",
-    "Re3",
-    "Rab8",
-    "Rd2",
-    "Rb7",
-    "Red3",
-    "Rb6",
-    "Bxc5",
-    "Rc6",
-    "Bb4",
-    "e4",
-    "Rb3",
-    "Rxc4",
-    "Ba5",
-    "Rdc8",
-    "Rb7+",
-    "Bc7",
-    "g3",
-    "Rb8",
-    "Rxc7+",
-    "Rxc7",
-    "Bxc7",
-    "Rb1+",
-    "Kg2"
-  ],
-  "max_ply": 72
+  "result": {
+    "cover_photo": {
+      "grade_description": "very poor",
+      "grade": "F",
+      "photos_controlled": "1/3",
+      "locations": [
+        {
+          "screenshot_url": "https://stg.air.cam/media/gmb-analyzer/7979196e-acbd-4212-a67f-ef196c9b1561_details.png",
+          "business_address": "7006 Sunset Blvd, Hollywood, CA 90028, USA"
+        },
+        {
+          "screenshot_url": null,
+          "business_address": "700 E 45th St, Long Beach, CA 90807, USA"
+        },
+        {
+          "screenshot_url": null,
+          "business_address": "1880 W Slauson Ave, Los Angeles, CA 90047, USA"
+        }
+      ],
+      "score": 33.333333333333336
+    },
+    "summary": {
+      "grade_description": "very poor",
+      "grade": "F",
+      "locations": [
+        {
+          "screenshot_url": "https://stg.air.cam/media/gmb-analyzer/7979196e-acbd-4212-a67f-ef196c9b1561_wo_header.png",
+          "business_address": "7006 Sunset Blvd, Hollywood, CA 90028, USA"
+        },
+        {
+          "screenshot_url": null,
+          "business_address": "700 E 45th St, Long Beach, CA 90807, USA"
+        },
+        {
+          "screenshot_url": null,
+          "business_address": "1880 W Slauson Ave, Los Angeles, CA 90047, USA"
+        }
+      ],
+      "score": 48.333333333333336,
+      "business_name": "IHOP"
+    },
+    "posting_frequency": {
+      "grade_description": "very poor",
+      "grade": "F",
+      "posted_recently": "0/3",
+      "score": 48.333333333333336,
+      "locations": [
+        {
+          "latest_photo_date_owner": "2021-10-05",
+          "grade_description": "above average",
+          "grade": "B",
+          "business_address": "7006 Sunset Blvd, Hollywood, CA 90028, USA",
+          "score": 85.0,
+          "latest_photo_date": "2021-10-18",
+          "latest_photo_count_owner": 16,
+          "latest_photo_count": 23
+        },
+        {
+          "latest_photo_date_owner": null,
+          "grade_description": "very poor",
+          "grade": "F",
+          "business_address": "700 E 45th St, Long Beach, CA 90807, USA",
+          "score": 30.0,
+          "latest_photo_date": "2021-09-25",
+          "latest_photo_count_owner": 0,
+          "latest_photo_count": 1
+        },
+        {
+          "latest_photo_date_owner": null,
+          "grade_description": "very poor",
+          "grade": "F",
+          "business_address": "1880 W Slauson Ave, Los Angeles, CA 90047, USA",
+          "score": 30.0,
+          "latest_photo_date": "2021-10-11",
+          "latest_photo_count_owner": 0,
+          "latest_photo_count": 6
+        }
+      ]
+    },
+    "keyword_photo": {
+      "grade_description": "average",
+      "grade": "C",
+      "locations": [
+        {
+          "screenshot_url": "https://stg.air.cam/media/gmb-analyzer/7979196e-acbd-4212-a67f-ef196c9b1561_nearby.png",
+          "business_address": "7006 Sunset Blvd, Hollywood, CA 90028, USA"
+        },
+        {
+          "screenshot_url": null,
+          "business_address": "700 E 45th St, Long Beach, CA 90807, USA"
+        },
+        {
+          "screenshot_url": null,
+          "business_address": "1880 W Slauson Ave, Los Angeles, CA 90047, USA"
+        }
+      ],
+      "keyword": "Pancakes",
+      "score": 75.0
+    },
+    "entity_detection": {
+      "term_counts": [
+        { "term": "meal", "count": 24 },
+        { "term": "tableware", "count": 24 },
+        { "term": "food", "count": 23 },
+        { "term": "ingredient", "count": 19 },
+        { "term": "breakfast", "count": 19 },
+        { "term": "ihop", "count": 18 },
+        { "term": "plate", "count": 17 },
+        { "term": "recipe", "count": 15 },
+        { "term": "pancake", "count": 13 },
+        { "term": "dishware", "count": 12 },
+        { "term": "dish", "count": 12 },
+        { "term": "table", "count": 11 },
+        { "term": "cuisine", "count": 10 },
+        { "term": "", "count": 10 },
+        { "term": "full breakfast", "count": 9 },
+        { "term": "dish network", "count": 9 },
+        { "term": "dessert", "count": 8 },
+        { "term": "cup", "count": 8 },
+        { "term": "coffee cup", "count": 7 },
+        { "term": "building", "count": 7 },
+        { "term": "brunch", "count": 7 },
+        { "term": "restaurant", "count": 7 },
+        { "term": "french fries", "count": 6 },
+        { "term": "staple food", "count": 6 },
+        { "term": "sky", "count": 5 },
+        { "term": "signage", "count": 5 },
+        { "term": "coffee", "count": 5 },
+        { "term": "drinkware", "count": 5 },
+        { "term": "fast food", "count": 5 },
+        { "term": "cuban espresso", "count": 5 },
+        { "term": "serveware", "count": 4 },
+        { "term": "produce", "count": 4 },
+        { "term": "american cuisine", "count": 4 },
+        { "term": "burger", "count": 4 },
+        { "term": "junk food", "count": 4 },
+        { "term": "passion fruit juice", "count": 4 },
+        { "term": "lunch", "count": 4 },
+        { "term": "ceiling", "count": 4 },
+        { "term": "flavor", "count": 3 },
+        { "term": "mitsui cuisine m", "count": 3 },
+        { "term": "strawberry", "count": 3 },
+        { "term": "cream", "count": 3 },
+        { "term": "frozen dessert", "count": 3 },
+        { "term": "whipped cream", "count": 3 },
+        { "term": "tea", "count": 3 },
+        { "term": "plant", "count": 3 },
+        { "term": "baked goods", "count": 3 },
+        { "term": "facade", "count": 3 },
+        { "term": "commercial building", "count": 3 },
+        { "term": "cake", "count": 3 },
+        { "term": "fork", "count": 3 },
+        { "term": "floor", "count": 3 },
+        { "term": "menu", "count": 3 },
+        { "term": "furniture", "count": 3 },
+        { "term": "flooring", "count": 3 },
+        { "term": "kopi tubruk", "count": 3 },
+        { "term": "java coffee", "count": 3 },
+        { "term": "dinner", "count": 3 },
+        { "term": "side dish", "count": 3 },
+        { "term": "street light", "count": 2 },
+        { "term": "tree", "count": 2 },
+        { "term": "city", "count": 2 },
+        { "term": "citymd", "count": 2 },
+        { "term": "fruit", "count": 2 },
+        { "term": "window", "count": 2 },
+        { "term": "lighting", "count": 2 },
+        { "term": "architecture", "count": 2 },
+        { "term": "house", "count": 2 },
+        { "term": "fried egg", "count": 2 },
+        { "term": "egg", "count": 2 },
+        { "term": "frying", "count": 2 },
+        { "term": "bun", "count": 2 },
+        { "term": "cheeseburger", "count": 2 },
+        { "term": "buffalo burger", "count": 2 },
+        { "term": "kids' meal", "count": 2 },
+        { "term": "espresso", "count": 2 },
+        { "term": "cake decorating", "count": 2 },
+        { "term": "juice", "count": 2 },
+        { "term": "hardwood", "count": 2 },
+        { "term": "drink", "count": 2 },
+        { "term": "real estate", "count": 2 },
+        { "term": "cafe", "count": 2 },
+        { "term": "single-origin coffee", "count": 2 },
+        { "term": "deep frying", "count": 2 },
+        { "term": "middle eastern cuisine", "count": 2 },
+        { "term": "chair", "count": 2 },
+        { "term": "interior design services", "count": 2 },
+        { "term": "design", "count": 2 },
+        { "term": "infrastructure", "count": 1 },
+        { "term": "neighbourhood", "count": 1 },
+        { "term": "street", "count": 1 },
+        { "term": "sedan", "count": 1 },
+        { "term": "light", "count": 1 },
+        { "term": "science", "count": 1 },
+        { "term": "animal product", "count": 1 },
+        { "term": "egg yolk", "count": 1 },
+        { "term": "animal fat", "count": 1 },
+        { "term": "clotted cream", "count": 1 },
+        { "term": "sandwich", "count": 1 },
+        { "term": "veggie burger", "count": 1 },
+        { "term": "luggage and bags", "count": 1 },
+        { "term": "bag", "count": 1 },
+        { "term": "backpack", "count": 1 },
+        { "term": "retail", "count": 1 },
+        { "term": "travel", "count": 1 },
+        { "term": "fast food restaurant", "count": 1 },
+        { "term": "fa\u00e7ade", "count": 1 },
+        { "term": "factory outlet shop", "count": 1 },
+        { "term": "bilberry", "count": 1 },
+        { "term": "berry", "count": 1 },
+        { "term": "sour cream", "count": 1 },
+        { "term": "door", "count": 1 },
+        { "term": "roof", "count": 1 },
+        { "term": "denny's", "count": 1 },
+        { "term": "pork", "count": 1 },
+        { "term": "b\u00e9chamel sauce", "count": 1 },
+        { "term": "cherry pie", "count": 1 },
+        { "term": "pie", "count": 1 },
+        { "term": "cherry", "count": 1 },
+        { "term": "fish and chips", "count": 1 },
+        { "term": "wood", "count": 1 },
+        { "term": "shelf", "count": 1 },
+        { "term": "bureaustoel hag creed 6003 stof zwart exr009", "count": 1 },
+        { "term": "wood flooring", "count": 1 },
+        { "term": "public library", "count": 1 },
+        { "term": "library", "count": 1 },
+        { "term": "baking", "count": 1 },
+        { "term": "bottle", "count": 1 },
+        { "term": "barware", "count": 1 },
+        { "term": "wine", "count": 1 },
+        { "term": "alcoholic beverage", "count": 1 },
+        { "term": "beer", "count": 1 },
+        { "term": "glass bottle", "count": 1 },
+        { "term": "product", "count": 1 },
+        { "term": "tire", "count": 1 },
+        { "term": "food craving", "count": 1 },
+        { "term": "eating", "count": 1 },
+        { "term": "awning", "count": 1 },
+        { "term": "automotive tire", "count": 1 },
+        { "term": "font", "count": 1 },
+        { "term": "automotive wheel system", "count": 1 },
+        { "term": "ghop!", "count": 1 },
+        { "term": "rally's", "count": 1 },
+        { "term": "kona coffee", "count": 1 },
+        { "term": "kapeng barako", "count": 1 },
+        { "term": "ceramic", "count": 1 },
+        { "term": "table m lamp restoration", "count": 1 },
+        { "term": "ihop breakfast sampler", "count": 1 },
+        { "term": "papaya juice", "count": 1 },
+        { "term": "orange drink", "count": 1 },
+        { "term": "orange juice", "count": 1 },
+        { "term": "take-out", "count": 1 },
+        { "term": "hash browns", "count": 1 },
+        { "term": "omelette", "count": 1 },
+        { "term": "russian cuisine", "count": 1 },
+        { "term": "sweetness", "count": 1 },
+        { "term": "full stack of pancakes", "count": 1 },
+        { "term": "hotteok", "count": 1 },
+        { "term": "buttermilk", "count": 1 },
+        { "term": "blueberry pancakes", "count": 1 },
+        { "term": "cheesecake pancakes", "count": 1 },
+        { "term": "souffl\u00e9 pancakes", "count": 1 },
+        { "term": "chocolate pancakes", "count": 1 },
+        { "term": "double chocolate pancakes", "count": 1 },
+        { "term": "interior design", "count": 1 },
+        { "term": "beauty", "count": 1 },
+        { "term": "event", "count": 1 },
+        { "term": "cafeteria", "count": 1 },
+        { "term": "rice", "count": 1 },
+        { "term": "spiced rice", "count": 1 },
+        { "term": "lemon juice", "count": 1 },
+        { "term": "european cuisine", "count": 1 },
+        { "term": "pastitsio", "count": 1 },
+        { "term": "waffle", "count": 1 },
+        { "term": "belgian waffle", "count": 1 }
+      ]
+    },
+    "version": 1,
+    "stock_photos": {
+      "grade_description": "very poor",
+      "grade": "F",
+      "score": 56.666666666666664,
+      "stock_photo_amount": "2/10"
+    },
+    "photo_control": {
+      "grade_description": "average",
+      "grade": "C+",
+      "photos_controlled": "3/10",
+      "locations": [
+        {
+          "business_address": "7006 Sunset Blvd, Hollywood, CA 90028, USA",
+          "photos": [
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/6adee018-932a-40a3-88b2-15f859bda1c6",
+              "vision_terms": null,
+              "is_owner": true
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/80030483-2c05-493c-b3ce-ac9e96f4a62d",
+              "vision_terms": null,
+              "is_owner": true
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/f44dfbac-e4a0-4e96-8b28-e1079d72dec0",
+              "vision_terms": null,
+              "is_owner": true
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/1bc40250-afc4-4913-baf6-4e44d1aa19be",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/28bceb6a-705a-4055-83a7-2166e10d7651",
+              "vision_terms": null,
+              "is_owner": true
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/0cf9963c-c2dc-448e-8d58-fe2b9ea793a8",
+              "vision_terms": null,
+              "is_owner": true
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/77c684b2-ef34-412b-8eab-28dbe14af565",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/419f755c-04c1-4019-876a-7c75904c4f51",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/a7463cce-a4a6-4e9e-81d0-649f249c51c2",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/d4b0a476-e526-4adb-9d91-1f228d9f3f60",
+              "vision_terms": null,
+              "is_owner": false
+            }
+          ]
+        },
+        {
+          "business_address": "700 E 45th St, Long Beach, CA 90807, USA",
+          "photos": [
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/41f4f0d6-ed98-4dea-84df-9f4dc0d1e7c4",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/a43fff1c-991a-433a-8086-e31bbfd72e5c",
+              "vision_terms": null,
+              "is_owner": true
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/21f94a36-3605-49a3-8ce4-427375c40ed0",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/66234e33-2241-498d-82a2-1808d180595c",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/908f4e74-c48a-4b98-bd40-4dde7c71794d",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/def23a4c-2bc7-463a-811d-caf4ca02d290",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/3131d3c6-9311-43d9-87ff-431a86b0280c",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/1da6f31c-987b-4a28-92ee-55efc4c0cdda",
+              "vision_terms": null,
+              "is_owner": true
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/1e83c9d1-0cc1-4eab-895a-2a11c5ca0034",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/e88df935-725b-407d-b264-11d1921ffbb3",
+              "vision_terms": null,
+              "is_owner": false
+            }
+          ]
+        },
+        {
+          "business_address": "1880 W Slauson Ave, Los Angeles, CA 90047, USA",
+          "photos": [
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/d4a8cf61-3c66-462c-b14e-7fc6cf5e032f",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/168ea4cc-4cd2-4c00-8b07-160df17b0fc4",
+              "vision_terms": null,
+              "is_owner": true
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/ae06a3dc-e953-4706-89d3-136ed95e4abd",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/26566e57-b098-40e6-8d9c-05de51f16b85",
+              "vision_terms": null,
+              "is_owner": true
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/c5c5d44d-5b78-4ec6-807e-5c7af34f1fc2",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/5ab966e7-6dd0-484a-98ce-862c63a01366",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/6eb64bd5-1acd-4c1f-9608-a538dde6133c",
+              "vision_terms": null,
+              "is_owner": true
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/80893503-47ef-4ffd-a344-9c56794cf020",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/1b87904c-b03f-4b7b-a348-278d67ae49a3",
+              "vision_terms": null,
+              "is_owner": false
+            },
+            {
+              "url": "https://stg.air.cam/media/gmb-analyzer-place-photo/fa0d7e4a-0dd7-4b11-baad-e544484f8a04",
+              "vision_terms": null,
+              "is_owner": false
+            }
+          ]
+        }
+      ],
+      "score": 78.33333333333333
+    }
+  },
+  "agency": null,
+  "status": "completed",
+  "error_message": null,
+  "uuid": "ef42b110-359d-4647-807f-0fd7171c90a5",
+  "review_status": "passed"
 }

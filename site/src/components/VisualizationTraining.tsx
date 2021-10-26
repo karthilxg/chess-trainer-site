@@ -257,7 +257,7 @@ export const VisualizationTraining = () => {
   const incrementDecrementStyles = s(c.buttons.basic, c.size(40));
   let [currentPosition, setCurrentPosition] = useState(new Chess());
   let [futurePosition, setFuturePosition] = useState(new Chess());
-  let [ply, setPly] = useState(6);
+  let [ply, setPly] = useState(4);
   let [hiddenMoves, setHiddenMoves] = useState(null);
   let [solutionMoves, setSolutionMoves] = useImmer([] as Move[]);
   const [flipped, setFlipped] = useState(false);
@@ -500,7 +500,8 @@ export const VisualizationTraining = () => {
                           ? c.colors.failureLight
                           : c.colors.successColor
                       ),
-                      c.weightBold
+                      c.weightBold,
+                      c.fontSize(isMobile ? 14 : 16)
                     )}
                   >
                     {progressMessage.message}
@@ -515,11 +516,12 @@ export const VisualizationTraining = () => {
                 style={s(
                   c.weightSemiBold,
                   c.fg(c.colors.textPrimary),
-                  c.fontSize(16)
+                  c.fontSize(isMobile ? 14 : 16)
                 )}
               >
                 {futurePosition.turn() == "b" ? "Black" : "White"} to move.
                 Visualize the following, or press play, then make the best move.
+                Feel free to change the ply if it's too difficult.
               </Text>
               <Space height={12} />
               <Text>

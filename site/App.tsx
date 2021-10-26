@@ -43,9 +43,9 @@ export default () => (
     </Helmet>
     <>
       <NavigationContainer linking={linking}>
-        <Stack.Navigator initialRouteName="Visualization">
+        <Stack.Navigator initialRouteName="visualization">
           <Stack.Screen
-            name="Visualization"
+            name="visualization"
             component={VisualizationTraining}
           />
         </Stack.Navigator>

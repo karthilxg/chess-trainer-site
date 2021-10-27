@@ -34,6 +34,7 @@ const Stack = createNativeStackNavigator();
 export default () => (
   <View nativeID="Blah">
     <Helmet>
+      <meta name="viewport" content="width=device-width, user-scalable=no" />
       <script
         async
         src="https://ackee.mbuffett.com/tracker.js"

@@ -12,7 +12,8 @@
   "scripts": {
     "dev:expo": "yarn workspace @expo-next-monorepo-example/expo dev",
     "dev:next": "yarn workspace @expo-next-monorepo-example/next dev",
-    "build": "cd packages/next && yarn export",
+    "build": "cd packages/next && yarn build",
+    "export": "cd packages/next && yarn export",
     "deploy": "vercel --prod --no-clipboard",
     "postinstall": "patch-package"
   },

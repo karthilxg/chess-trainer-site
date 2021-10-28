@@ -7,7 +7,8 @@ COPY . .
 ENV NODE_ENV=production
 RUN npm set progress=false && \
   npm install -g expo-cli
-RUN yarn build
+WORKDIR /base/packages/next
+RUN next export
 
 FROM nginx:latest
 # RUN rm -rf /etc/nginx

@@ -14,6 +14,12 @@ class Document extends NextDocument {
             // @ts-ignore
             crossorigin="anonymous"
           ></script>
+          <script
+            async
+            src="https://ackee.mbuffett.com/tracker.js"
+            data-ackee-server="https://ackee.mbuffett.com"
+            data-ackee-domain-id="70e91043-cea0-45ab-8b7b-1d3a2297311e"
+          ></script>
         </Head>
         <body>
           <Main />

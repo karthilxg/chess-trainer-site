@@ -1,4 +1,5 @@
 import { getInitialProps } from '@expo/next-adapter/document'
+import { c } from 'app/styles'
 import NextDocument, { Html, Head, Main, NextScript } from 'next/document'
 import React from 'react'
 
@@ -19,9 +20,15 @@ class Document extends NextDocument {
             src="https://ackee.mbuffett.com/tracker.js"
             data-ackee-server="https://ackee.mbuffett.com"
             data-ackee-domain-id="70e91043-cea0-45ab-8b7b-1d3a2297311e"
+            data-ackee-opts='{ "detailed": true }'
           ></script>
         </Head>
-        <body>
+        <body
+          style={{
+            backgroundColor: 'hsl(230, 40%, 4%)',
+            color: c.colors.textPrimary
+          }}
+        >
           <Main />
           <NextScript />
         </body>

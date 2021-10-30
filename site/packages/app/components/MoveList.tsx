@@ -11,7 +11,7 @@ import { s, c } from 'app/styles'
 import { times } from 'app/utils'
 import { forEach, isEmpty, cloneDeep, takeRight, first } from 'lodash'
 import client from 'app/client'
-import { Space } from 'app/Space'
+import { Spacer } from 'app/Space'
 import { Move } from '@lubert/chess.ts'
 
 export const MoveList = ({
@@ -68,7 +68,7 @@ export const MoveList = ({
               >
                 {i + 1}
               </Text>
-              <Space width={8} />
+              <Spacer width={8} />
               <Pressable
                 onPress={() => {
                   onMoveClick(whiteMove, whiteI)
@@ -98,7 +98,7 @@ export const MoveList = ({
                 </Text>
               </Pressable>
             </View>
-            {i != pairs.length - 1 && <Space height={4} />}
+            {i != pairs.length - 1 && <Spacer height={4} />}
           </View>
         )
       })}

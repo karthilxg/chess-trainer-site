@@ -23,12 +23,7 @@ class Document extends NextDocument {
             data-ackee-opts='{ "detailed": true }'
           ></script>
         </Head>
-        <body
-          style={{
-            backgroundColor: 'hsl(230, 40%, 4%)',
-            color: c.colors.textPrimary
-          }}
-        >
+        <body style={{}}>
           <Main />
           <NextScript />
         </body>

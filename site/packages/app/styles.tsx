@@ -168,17 +168,44 @@ const black = (opacity: number) => {
   return `hsla(0, 0%, 0%, ${opacity}%)`
 }
 
+const grayHue = 229
+const grays = {
+  10: `hsl(${grayHue}, 39%, 4%)`,
+  20: `hsl(${grayHue}, 20%, 8%)`,
+  30: `hsl(${grayHue}, 15%, 15%)`,
+  40: `hsl(${grayHue}, 15%, 25%)`,
+  50: `hsl(${grayHue}, 15%, 50%)`,
+  60: `hsl(${grayHue}, 14%, 70%)`,
+  70: `hsl(${grayHue}, 9%, 80%)`,
+  80: `hsl(${grayHue}, 5%, 90%)`,
+  90: `hsl(${grayHue}, 3%, 95%)`
+}
+const genShades = (hue: number) => {
+  return {
+    10: `hsl(${hue}, 45%, 8%)`,
+    20: `hsl(${hue}, 45%, 13%)`,
+    30: `hsl(${hue}, 40%, 18%)`,
+    40: `hsl(${hue}, 35%, 25%)`,
+    50: `hsl(${hue}, 35%, 40%)`,
+    60: `hsl(${hue}, 35%, 50%)`,
+    70: `hsl(${hue}, 40%, 80%)`,
+    80: `hsl(${hue}, 45%, 90%)`,
+    90: `hsl(${hue}, 45%, 95%)`
+  }
+}
+const primaries = genShades(181)
 const colors = {
-  textPrimary: 'hsl(0, 0%, 100%)',
-  textInverse: 'hsl(225, 37%, 16%)',
-  textAlternate: 'hsl(220, 29%, 83%)',
+  textPrimary: grays[90],
+  textInverse: grays[30],
   successColor: 'hsl(164, 98%, 35%)',
   failureColor: 'hsl(340, 70%, 52%)',
   failureLight: 'hsl(348, 100%, 72%)',
-  buttonPrimary: 'hsl(181, 45%, 40%)',
   buttonSecondary: 'hsl(215, 35%, 95%)',
-  backgroundColor: 'hsl(229, 39%, 10%)',
-  modalColor: 'hsl(229, 10%, 90%)'
+  backgroundColor: grays[10],
+  header: 'hsl(229, 19%, 14%)',
+  modalColor: 'hsl(229, 10%, 90%)',
+  lightTile: hsl(180, 15, 70),
+  darkTile: hsl(180, 15, 40)
 }
 
 const basicButtonStyles = s(
@@ -215,7 +242,7 @@ const disabledButtonStyles = s(
     textStyles: s(weightBold, fontSize(16), fg('white'))
   }
 )
-const primaryButtonStyles = s(basicButtonStyles, bg(colors.buttonPrimary), {
+const primaryButtonStyles = s(basicButtonStyles, bg(primaries[50]), {
   textStyles: s(weightBold, fg(colors.textPrimary), fontSize(16))
 })
 const buttons = {
@@ -247,6 +274,7 @@ export const c = {
   weightRegular,
   weightSemiBold,
   weightBold,
+  primaries,
   weightHeavy,
   weightBlack,
   flexGrow,
@@ -273,6 +301,7 @@ export const c = {
   justifyEnd,
   justifyBetween,
   alignCenter,
+  grays,
   alignStretch,
   justifyCenter,
   fg,

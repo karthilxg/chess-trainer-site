@@ -37,14 +37,12 @@ import {
 import { useImmer } from 'use-immer'
 import { LichessPuzzle } from 'app/models'
 import client from 'app/client'
-import { Space } from 'app/Space'
+import { Spacer } from 'app/Space'
 import { Move, Square } from '@lubert/chess.ts/dist/types'
 import { ChessboardBiref } from 'app/types/ChessboardBiref'
 import { useEffectWithPrevious } from 'app/utils/useEffectWithPrevious'
 import { useComponentLayout } from 'app/utils/useComponentLayout'
-
-const lightTileColor = c.hsl(180, 15, 70)
-const darkTileColor = c.hsl(180, 15, 40)
+import { ChessColor } from 'app/types/Chess'
 
 enum ChessPiece {
   Pawn = 'p',
@@ -54,8 +52,6 @@ enum ChessPiece {
   Queen = 'q',
   King = 'k'
 }
-
-type ChessColor = 'w' | 'b'
 
 const getIconForPiece = (piece: PieceSymbol, color: ChessColor) => {
   switch (color) {
@@ -106,18 +102,20 @@ const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 const rows = [1, 2, 3, 4, 5, 6, 7, 8]
 
 export const ChessboardView = ({
+  hideColors,
   currentPosition,
   futurePosition,
-  flipped,
-  attemptSolution,
-  showFuturePosition,
-  biref
+  flipped = false,
+  showFuturePosition = false,
+  biref,
+  frozen = false
 }: {
-  currentPosition
-  futurePosition
-  flipped
-  attemptSolution
-  showFuturePosition
+  hideColors?: boolean
+  currentPosition?: Chess
+  futurePosition?: Chess
+  flipped?: boolean
+  showFuturePosition?: boolean
+  frozen?: boolean
   biref: ChessboardBiref
 }) => {
   // @ts-ignore
@@ -187,6 +185,7 @@ export const ChessboardView = ({
   const [highlightedSquares, setHighlightedSquares] = useImmer([] as Square[])
   useEffectWithPrevious(
     (previousHighlightedSquares = []) => {
+      console.log('new highlighted squares', highlightedSquares)
       let highlightFadeDuration = 100
       previousHighlightedSquares.map((sq) => {
         Animated.timing(squareHighlightAnims[sq], {
@@ -223,12 +222,17 @@ export const ChessboardView = ({
     ]).start()
   }
   biref.flashRing = flashRing
+  biref.highlightSquare = (square?: Square) => {
+    console.log('setting squares', [square])
+    setHighlightedSquares(square ? [square] : [])
+  }
   const testRef = useRef(null)
   useEffect(() => {
     if (testRef.current) {
       testRef.current.setAttribute('id', 'test')
     }
   })
+  const hiddenColorsBorder = `1px solid ${c.grays[70]}`
 
   const { width: windowWidth } = useWindowDimensions()
   return (
@@ -238,16 +242,19 @@ export const ChessboardView = ({
       onLayout={onChessboardLayout}
     >
       <View
-        style={{
-          width: '100%',
-          height: '100%',
-          position: 'absolute',
-          borderRadius: 2,
-          overflow: 'hidden',
-          shadowColor: 'black',
-          shadowOpacity: 0.4,
-          shadowRadius: 10
-        }}
+        style={s(
+          {
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            borderRadius: 2,
+            overflow: 'hidden',
+            shadowColor: 'black',
+            shadowOpacity: 0.4,
+            shadowRadius: 10
+          },
+          hideColors && c.border(hiddenColorsBorder)
+        )}
       >
         <Animated.View
           ref={testRef}
@@ -286,7 +293,11 @@ export const ChessboardView = ({
                 style={s(c.fullWidth, c.bg('red'), c.row, c.grow, c.flexible)}
               >
                 {times(8)((j) => {
-                  let color = (i + j) % 2 == 0 ? lightTileColor : darkTileColor
+                  let color =
+                    (i + j) % 2 == 0 ? c.colors.lightTile : c.colors.darkTile
+                  if (hideColors) {
+                    color = c.grays[30]
+                  }
                   let square = `${columns[j]}${rows[7 - i]}` as Square
                   if (flipped) {
                     square = `${columns[7 - j]}${rows[i]}` as Square
@@ -294,7 +305,7 @@ export const ChessboardView = ({
                   let position = showFuturePosition
                     ? futurePosition
                     : currentPosition
-                  let piece = position.get(square)
+                  let piece = position?.get(square)
                   let pieceView = null
                   if (piece) {
                     pieceView = (
@@ -302,6 +313,8 @@ export const ChessboardView = ({
                     )
                   }
                   let availableMove = availableMoves.find((m) => m.to == square)
+                  const isBottomEdge = i == 7
+                  const isRightEdge = j == 7
                   return (
                     <Pressable
                       key={j}
@@ -311,12 +324,20 @@ export const ChessboardView = ({
                         c.center,
                         c.clickable,
                         c.flexible,
-                        c.overflowHidden
+                        c.overflowHidden,
+                        hideColors &&
+                          s(
+                            !isBottomEdge && c.borderBottom(hiddenColorsBorder),
+                            !isRightEdge && c.borderRight(hiddenColorsBorder)
+                          )
                       )}
                       onPress={() => {
+                        if (!futurePosition && !currentPosition) {
+                          return
+                        }
                         if (availableMove) {
                           setAvailableMoves([])
-                          attemptSolution(availableMove)
+                          biref.attemptSolution(availableMove)
                           return
                         }
                         let moves = futurePosition.moves({
@@ -328,7 +349,7 @@ export const ChessboardView = ({
                           first(availableMoves).from == square
                         ) {
                           setAvailableMoves([])
-                        } else {
+                        } else if (!frozen) {
                           // @ts-ignore
                           setAvailableMoves(moves)
                         }

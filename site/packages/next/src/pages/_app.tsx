@@ -8,7 +8,6 @@ import 'setimmediate'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Head from 'next/head'
 import { AppProps } from 'next/app'
-import { DripsyProvider } from 'dripsy'
 
 import { theme } from 'app/theme'
 
@@ -16,7 +15,8 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Example</title>
+        <title>Chess madra</title>
+        <meta name="description" content="A chess training site." />
         <meta key="title" name="title" content="Example" />
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.png" />
         <meta
@@ -24,11 +24,9 @@ export default function App({ Component, pageProps }: AppProps) {
           name="viewport"
         />
       </Head>
-      <DripsyProvider theme={theme}>
-        <SafeAreaProvider>
-          <Component {...pageProps} />
-        </SafeAreaProvider>
-      </DripsyProvider>
+      <SafeAreaProvider>
+        <Component {...pageProps} />
+      </SafeAreaProvider>
     </>
   )
 }

@@ -9,7 +9,7 @@ import {
 } from 'react-native'
 // import { ExchangeRates } from "app/ExchangeRate";
 import { c, s } from 'app/styles'
-import { Space } from 'app/Space'
+import { Spacer } from 'app/Space'
 import { ChessboardView } from 'app/components/chessboard/Chessboard'
 import axios from 'axios'
 import { Helmet } from 'react-helmet'
@@ -25,6 +25,8 @@ import { ChessboardBiref } from 'app/types/ChessboardBiref'
 import { Button } from './Button'
 import useState from 'react-usestateref'
 import { useStorageState } from 'react-storage-hooks'
+import { TrainerLayout } from 'app/components/TrainerLayout'
+import { useIsMobile } from 'app/utils/isMobile'
 
 const fakePuzzle: LichessPuzzle = {
   id: '01MQ3',
@@ -239,18 +241,12 @@ const fetchNewPuzzle = async (maxPly: number): Promise<LichessPuzzle> => {
 }
 
 export const VisualizationTraining = () => {
-  const { width: windowWidth } = useWindowDimensions()
-  const isMobile = windowWidth < 1000
+  const isMobile = useIsMobile()
   useEffect(() => {
     setTimeout(() => {
       document.title = 'chessmadra'
     }, 100)
   })
-  useEffect(() => {
-    if (Platform.OS === 'web') {
-      document.body.style.backgroundColor = 'hsl(230, 40%, 4%)'
-    }
-  }, [])
   const [progressMessage, setProgressMessage] = useState(
     (testProgress
       ? { message: 'Test message', type: ProgressMessageType.Error }
@@ -264,7 +260,13 @@ export const VisualizationTraining = () => {
   let [solutionMoves, setSolutionMoves] = useImmer([] as Move[])
   const [flipped, setFlipped] = useState(false)
   const [puzzle, setPuzzle] = useState(test ? fakeBlackPuzzle : null)
+  const [nextPuzzle, setNextPuzzle] = useState(null)
   const refreshPuzzle = () => {
+    if (nextPuzzle) {
+      setNextPuzzle(null)
+      setPuzzle(nextPuzzle)
+      return
+    }
     ;(async () => {
       let newPuzzle = await fetchNewPuzzle(ply)
       setPuzzle(newPuzzle)
@@ -276,6 +278,11 @@ export const VisualizationTraining = () => {
   useEffect(() => {
     if (puzzle === null) {
       refreshPuzzle()
+    }
+    if (puzzle && nextPuzzle == null) {
+      ;(async () => {
+        setNextPuzzle(await fetchNewPuzzle(ply))
+      })()
     }
   }, [puzzle])
   // TODO: helper to make state and ref
@@ -369,8 +376,8 @@ export const VisualizationTraining = () => {
     [solutionMoves]
   )
   const biref: ChessboardBiref = useMemo(() => {
-    return {}
-  }, [])
+    return { attemptSolution }
+  }, [attemptSolution])
   useEffect(() => {
     if (puzzle) {
       setFocusedMoveIndex(null)
@@ -465,186 +472,156 @@ export const VisualizationTraining = () => {
           ></i>
         </Button>
       </View>
-      <Space height={12} />
+      <Spacer height={12} />
     </>
   )
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        backgroundColor: 'none'
-      }}
+    <TrainerLayout
+      chessboard={
+        <ChessboardView
+          {...{
+            frozen: isEmpty(solutionMoves),
+            biref,
+            flipped,
+            currentPosition,
+            futurePosition,
+            showFuturePosition
+          }}
+        />
+      }
     >
-      <View
-        style={s(
-          c.fullWidth,
-          !isMobile && c.center,
-          !isMobile && c.minWidth('100vw'),
-          !isMobile && c.minHeight('100vh'),
-          isMobile && c.px(10),
-          isMobile && c.pt(10)
-        )}
-      >
-        <View
+      {progressMessage && (
+        <>
+          <View style={s(c.br(4), c.fullWidth)}>
+            <Text
+              style={s(
+                c.fg(
+                  progressMessage.type === ProgressMessageType.Error
+                    ? c.colors.failureLight
+                    : c.colors.successColor
+                ),
+                c.weightBold,
+                c.fontSize(isMobile ? 14 : 16)
+              )}
+            >
+              {progressMessage.message}
+            </Text>
+          </View>
+          <Spacer height={12} />
+        </>
+      )}
+      {!showFuturePosition && isMobile && player}
+      <View style={s()}>
+        <Text
           style={s(
-            isMobile && s(c.alignCenter),
-            isMobile ? c.column : s(c.row, c.alignStart)
+            c.weightSemiBold,
+            c.fg(c.colors.textPrimary),
+            c.fontSize(isMobile ? 14 : 16)
           )}
         >
-          <View style={s(c.width(500), c.maxWidth('100%'))}>
-            <ChessboardView
-              {...{
-                attemptSolution,
-                biref,
-                flipped,
-                currentPosition,
-                futurePosition,
-                showFuturePosition
-              }}
-            />
-          </View>
-          <Space height={12} width={12} isMobile={isMobile} />
-          <View style={s(c.column, c.maxWidth(500), c.fullWidth)}>
-            {progressMessage && (
-              <>
-                <View style={s(c.br(4), c.fullWidth)}>
-                  <Text
-                    style={s(
-                      c.fg(
-                        progressMessage.type === ProgressMessageType.Error
-                          ? c.colors.failureLight
-                          : c.colors.successColor
-                      ),
-                      c.weightBold,
-                      c.fontSize(isMobile ? 14 : 16)
-                    )}
-                  >
-                    {progressMessage.message}
-                  </Text>
-                </View>
-                <Space height={12} />
-              </>
-            )}
-            {!showFuturePosition && isMobile && player}
-            <View style={s()}>
-              <Text
-                style={s(
-                  c.weightSemiBold,
-                  c.fg(c.colors.textPrimary),
-                  c.fontSize(isMobile ? 14 : 16)
-                )}
-              >
-                {futurePosition.turn() == 'b' ? 'Black' : 'White'} to move.
-                Visualize the following, or press play, then make the best move.
-                Feel free to change the ply if it's too difficult.
-              </Text>
-              <Space height={12} />
-              <Text>
-                <MoveList
-                  focusedMoveIndex={focusedMoveIndex}
-                  moveList={hiddenMoves}
-                  onMoveClick={(move, i) => {
-                    setFocusedMoveIndex(i)
-                    biref.highlightMove(move)
-                  }}
-                />
-              </Text>
-            </View>
-            <Space height={24} />
-            {!showFuturePosition && !isMobile && player}
-            <View style={s(c.row, c.fullWidth, c.height(48))}>
-              <Button
-                style={s(c.buttons.basic, c.noBasis, c.grow)}
-                onPress={() => {
-                  refreshPuzzle()
-                }}
-              >
-                <Text style={s(c.buttons.basic.textStyles)}>
-                  <i
-                    style={s(c.fg(c.colors.textInverse))}
-                    className="fas fa-random"
-                  ></i>
-                  <Space width={8} />
-                  New puzzle
-                </Text>
-              </Button>
-              <Space height={12} width={12} isMobile={isMobile} />
-              <Button
-                style={s(c.buttons.basic, c.noBasis, c.grow)}
-                onPress={() => {
-                  ;(async () => {
-                    if (Platform.OS == 'web') {
-                      window.open(
-                        `https://lichess.org/training/${puzzle.id}`,
-                        '_blank'
-                      )
-                    }
-                  })()
-                }}
-              >
-                <Text style={s(c.buttons.basic.textStyles)}>
-                  <i
-                    style={s(c.fg(c.colors.textInverse))}
-                    className="fas fa-external-link-alt"
-                  ></i>
-                  <Space width={8} />
-                  Lichess
-                </Text>
-              </Button>
-              <Space height={12} width={12} isMobile={isMobile} />
-              <Button
-                style={s(c.buttons.basic, c.size(48))}
-                onPress={() => {
-                  setSettingsOpen(true)
-                }}
-              >
-                <i
-                  style={s(c.fg(c.colors.textInverse))}
-                  className="fas fa-gear"
-                ></i>
-              </Button>
-            </View>
-            <Space height={12} />
-            {debugButtons && (
-              <>
-                <Space height={12} />
-                <Button
-                  style={c.buttons.basic}
-                  onPress={() => {
-                    biref.flashRing()
-                  }}
-                >
-                  Flash ring
-                </Button>
-                <Space height={12} />
-                <Button
-                  style={c.buttons.basic}
-                  onPress={() => {
-                    currentPosition.move(hiddenMoves[0])
-                    setHiddenMoves((s) => {
-                      s.shift()
-                      return s
-                    })
-                  }}
-                >
-                  Advance one move
-                </Button>
-                <Space height={12} />
-                <Button
-                  style={c.buttons.basic}
-                  onPress={() => {
-                    setShowFuturePosition(true)
-                  }}
-                >
-                  Show future position
-                </Button>
-              </>
-            )}
-          </View>
-        </View>
+          {futurePosition.turn() == 'b' ? 'Black' : 'White'} to move. Visualize
+          the following, or press play, then make the best move. Feel free to
+          change the ply if it's too difficult.
+        </Text>
+        <Spacer height={12} />
+        <Text>
+          <MoveList
+            focusedMoveIndex={focusedMoveIndex}
+            moveList={hiddenMoves}
+            onMoveClick={(move, i) => {
+              setFocusedMoveIndex(i)
+              biref.highlightMove(move)
+            }}
+          />
+        </Text>
       </View>
+      <Spacer height={24} />
+      {!showFuturePosition && !isMobile && player}
+      <View style={s(c.row, c.fullWidth, c.height(48))}>
+        <Button
+          style={s(c.buttons.basic, c.noBasis, c.grow)}
+          onPress={() => {
+            refreshPuzzle()
+          }}
+        >
+          <Text style={s(c.buttons.basic.textStyles)}>
+            <i
+              style={s(c.fg(c.colors.textInverse))}
+              className="fas fa-random"
+            ></i>
+            <Spacer width={8} />
+            New puzzle
+          </Text>
+        </Button>
+        <Spacer height={12} width={12} isMobile={isMobile} />
+        <Button
+          style={s(c.buttons.basic, c.noBasis, c.grow)}
+          onPress={() => {
+            ;(async () => {
+              if (Platform.OS == 'web') {
+                window.open(
+                  `https://lichess.org/training/${puzzle.id}`,
+                  '_blank'
+                )
+              }
+            })()
+          }}
+        >
+          <Text style={s(c.buttons.basic.textStyles)}>
+            <i
+              style={s(c.fg(c.colors.textInverse))}
+              className="fas fa-external-link-alt"
+            ></i>
+            <Spacer width={8} />
+            Lichess
+          </Text>
+        </Button>
+        <Spacer height={12} width={12} isMobile={isMobile} />
+        <Button
+          style={s(c.buttons.basic, c.size(48))}
+          onPress={() => {
+            setSettingsOpen(true)
+          }}
+        >
+          <i style={s(c.fg(c.colors.textInverse))} className="fas fa-gear"></i>
+        </Button>
+      </View>
+      <Spacer height={12} />
+      {debugButtons && (
+        <>
+          <Spacer height={12} />
+          <Button
+            style={c.buttons.basic}
+            onPress={() => {
+              biref.flashRing()
+            }}
+          >
+            Flash ring
+          </Button>
+          <Spacer height={12} />
+          <Button
+            style={c.buttons.basic}
+            onPress={() => {
+              currentPosition.move(hiddenMoves[0])
+              setHiddenMoves((s) => {
+                s.shift()
+                return s
+              })
+            }}
+          >
+            Advance one move
+          </Button>
+          <Spacer height={12} />
+          <Button
+            style={c.buttons.basic}
+            onPress={() => {
+              setShowFuturePosition(true)
+            }}
+          >
+            Show future position
+          </Button>
+        </>
+      )}
       <Modal
         animationType="fade"
         transparent={true}
@@ -696,7 +673,7 @@ export const VisualizationTraining = () => {
               >
                 Hidden moves
               </Text>
-              <Space height={12} />
+              <Spacer height={12} />
               <View style={s(c.row, c.alignCenter)}>
                 <Button
                   onPress={() => {
@@ -706,7 +683,7 @@ export const VisualizationTraining = () => {
                 >
                   -
                 </Button>
-                <Space width={12} />
+                <Spacer width={12} />
                 <View style={s(c.column, c.alignCenter, c.width(40))}>
                   <Text
                     style={s(
@@ -718,7 +695,7 @@ export const VisualizationTraining = () => {
                     {ply}
                   </Text>
                 </View>
-                <Space width={12} />
+                <Spacer width={12} />
                 <Button
                   onPress={() => {
                     setPly(ply + 1)
@@ -732,6 +709,6 @@ export const VisualizationTraining = () => {
           </Pressable>
         </Pressable>
       </Modal>
-    </View>
+    </TrainerLayout>
   )
 }

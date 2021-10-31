@@ -1,4 +1,5 @@
 import '../styles/global.scss'
+import { c } from 'app/styles'
 
 import 'raf/polyfill'
 // @ts-ignore
@@ -21,6 +22,7 @@ export default function App({ Component, pageProps }: AppProps) {
           content="Improve your chess visualization. 100,000+ puzzles. See moves play out on the board."
         />
         <meta property="og:title" content="Chess Madra" />
+        <meta name="theme-color" content={c.grays[20]}>
         <meta
           property="og:description"
           content="Improve your chess visualization. 100,000+ puzzles. See moves play out on the board."

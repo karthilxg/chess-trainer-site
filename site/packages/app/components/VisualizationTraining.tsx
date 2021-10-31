@@ -32,6 +32,13 @@ import { useStorageState } from 'react-storage-hooks'
 import { TrainerLayout } from 'app/components/TrainerLayout'
 import { useIsMobile } from 'app/utils/isMobile'
 
+const isCheckmate = (move: Move, position: Chess) => {
+  position.move(move)
+  let isCheckMate = position.inCheckmate()
+  position.undo()
+  return isCheckMate
+}
+
 const fakePuzzle: LichessPuzzle = {
   id: '01MQ3',
   moves: ['c8b8', 'b7c7', 'c4c7', 'a5c7'],
@@ -355,11 +362,16 @@ export const VisualizationTraining = () => {
 
   const attemptSolution = useCallback(
     (move: Move) => {
-      if (move.san == solutionMoves[0].san) {
+      if (
+        move.san == solutionMoves[0].san ||
+        isCheckmate(move, futurePosition)
+      ) {
         setShowFuturePosition(true)
         biref.flashRing()
-        futurePosition.move(solutionMoves[0])
-        futurePosition.move(solutionMoves[1])
+        futurePosition.move(move)
+        if (solutionMoves[1]) {
+          futurePosition.move(solutionMoves[1])
+        }
         setSolutionMoves((s) => {
           s.shift()
           s.shift()

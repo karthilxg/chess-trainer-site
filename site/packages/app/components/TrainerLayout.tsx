@@ -30,7 +30,7 @@ export const TrainerLayout = ({ chessboard, children }: any) => {
             c.fullWidth,
             !isMobile && c.center,
             !isMobile && c.minWidth('100vw'),
-            !isMobile && c.mt(48),
+            !isMobile && c.my(48),
             isMobile && c.px(10),
             isMobile && c.pt(10)
           )}
@@ -51,8 +51,16 @@ export const TrainerLayout = ({ chessboard, children }: any) => {
           </View>
         </View>
       </View>
-      <View style={s(c.fullWidth, c.height(48), c.bg(c.grays[40]), c.center)}>
-        <Text style={c.fg(c.grays[90])}>
+      <View
+        style={s(
+          c.fullWidth,
+          c.minHeight(48),
+          c.py(16),
+          c.bg(c.grays[40]),
+          c.center
+        )}
+      >
+        <Text style={s(c.fg(c.grays[90]), c.px(24))}>
           If you have any feedback or suggestions, feel free to email me at{' '}
           <a
             style={s(

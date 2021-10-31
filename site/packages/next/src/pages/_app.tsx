@@ -16,7 +16,10 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <title>Chess madra</title>
-        <meta name="description" content="A chess training site." />
+        <meta
+          name="description"
+          content="Improve your chess visualization. 100,000+ puzzles. See moves play out on the board."
+        />
         <meta key="title" name="title" content="Example" />
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.png" />
         <meta

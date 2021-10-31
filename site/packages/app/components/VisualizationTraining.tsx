@@ -10,7 +10,11 @@ import {
 // import { ExchangeRates } from "app/ExchangeRate";
 import { c, s } from 'app/styles'
 import { Spacer } from 'app/Space'
-import { ChessboardView } from 'app/components/chessboard/Chessboard'
+import {
+  ChessboardView,
+  getAnimationDurations,
+  PlaybackSpeed
+} from 'app/components/chessboard/Chessboard'
 import axios from 'axios'
 import { Helmet } from 'react-helmet'
 import { useImmer } from 'use-immer'
@@ -255,7 +259,7 @@ export const VisualizationTraining = () => {
   const incrementDecrementStyles = s(c.buttons.basicInverse, c.size(40))
   let [currentPosition, setCurrentPosition] = useState(new Chess())
   let [futurePosition, setFuturePosition] = useState(new Chess())
-  let [ply, setPly] = useStorageState(localStorage, 'visualization-ply', 4)
+  let [ply, setPly] = useStorageState(localStorage, 'visualization-ply', 2)
   let [hiddenMoves, setHiddenMoves] = useState(null)
   let [solutionMoves, setSolutionMoves] = useImmer([] as Move[])
   const [flipped, setFlipped] = useState(false)
@@ -319,6 +323,11 @@ export const VisualizationTraining = () => {
       focusOnMove(i, null, false)
     }
   }
+  const [playbackSpeed, setPlaybackSpeed] = useStorageState(
+    localStorage,
+    'playback-speed',
+    PlaybackSpeed.Normal
+  )
   const animateMoves = useCallback(() => {
     if (isPlaying) {
       setIsPlaying(false)
@@ -331,7 +340,10 @@ export const VisualizationTraining = () => {
       let move = moves.shift()
       if (move && isPlayingRef.current) {
         focusOnMove(i, () => {
+          // let delay = getAnimationDurations(playbackSpeed)[2]
+          // window.setTimeout(() => {
           animateNextMove()
+          // }, delay)
         })
         i++
       } else {
@@ -339,7 +351,7 @@ export const VisualizationTraining = () => {
       }
     }
     animateNextMove()
-  }, [hiddenMoves, isPlaying])
+  }, [hiddenMoves, isPlaying, playbackSpeed])
 
   const attemptSolution = useCallback(
     (move: Move) => {
@@ -359,7 +371,7 @@ export const VisualizationTraining = () => {
           } else {
             setProgressMessage({
               message:
-                "You've completed this puzzle! Hit next puzzle to continue training",
+                "You've completed this puzzle! Hit new puzzle to continue training",
               type: ProgressMessageType.Success
             })
           }
@@ -475,6 +487,23 @@ export const VisualizationTraining = () => {
       <Spacer height={12} />
     </>
   )
+  const speedButtonProps = useCallback(
+    (ps) => {
+      const props = {
+        onPress: () => {
+          setPlaybackSpeed(ps)
+        }
+      }
+      if (ps == playbackSpeed) {
+        props.style = s(c.buttons.basicInverse)
+      } else {
+        props.style = s(c.buttons.basic)
+      }
+      console.log('props', props)
+      return props
+    },
+    [playbackSpeed]
+  )
   return (
     <TrainerLayout
       chessboard={
@@ -482,6 +511,7 @@ export const VisualizationTraining = () => {
           {...{
             frozen: isEmpty(solutionMoves),
             biref,
+            playbackSpeed,
             flipped,
             currentPosition,
             futurePosition,
@@ -520,8 +550,8 @@ export const VisualizationTraining = () => {
           )}
         >
           {futurePosition.turn() == 'b' ? 'Black' : 'White'} to move. Visualize
-          the following, or press play, then make the best move. Feel free to
-          change the ply if it's too difficult.
+          the following, or press play, then make the best move. Go to settings
+          to adjust the difficulty.
         </Text>
         <Spacer height={12} />
         <Text>
@@ -641,7 +671,7 @@ export const VisualizationTraining = () => {
               e.stopPropagation()
             }}
             style={s(
-              c.bg(c.colors.modalColor),
+              c.bg(c.grays[70]),
               c.br(2),
               c.column,
               c.unclickable,
@@ -703,6 +733,27 @@ export const VisualizationTraining = () => {
                   style={s(incrementDecrementStyles)}
                 >
                   +
+                </Button>
+              </View>
+              <Spacer height={24} />
+              <Text
+                style={s(
+                  c.fg(c.colors.textInverse),
+                  c.fontSize(18),
+                  c.weightBold
+                )}
+              >
+                Playback speed
+              </Text>
+              <Spacer height={12} />
+              <View>
+                <Button {...speedButtonProps(PlaybackSpeed.Slow)}>Slow</Button>
+                <Button {...speedButtonProps(PlaybackSpeed.Normal)}>
+                  Normal
+                </Button>
+                <Button {...speedButtonProps(PlaybackSpeed.Fast)}>Fast</Button>
+                <Button {...speedButtonProps(PlaybackSpeed.Ludicrous)}>
+                  Ludicrous
                 </Button>
               </View>
             </View>

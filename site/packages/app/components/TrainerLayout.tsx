@@ -15,7 +15,7 @@ import { useIsMobile } from 'app/utils/isMobile'
 export const TrainerLayout = ({ chessboard, children }: any) => {
   const isMobile = useIsMobile()
   return (
-    <View style={s(c.column, c.bg(c.grays[20]), c.minHeight('100vh'))}>
+    <View style={s(c.column, c.minHeight('100vh'))}>
       <NavBar />
       <View
         style={{
@@ -30,7 +30,7 @@ export const TrainerLayout = ({ chessboard, children }: any) => {
             c.fullWidth,
             !isMobile && c.center,
             !isMobile && c.minWidth('100vw'),
-            !isMobile && c.minHeight('100vh'),
+            !isMobile && c.mt(48),
             isMobile && c.px(10),
             isMobile && c.pt(10)
           )}
@@ -50,6 +50,21 @@ export const TrainerLayout = ({ chessboard, children }: any) => {
             </View>
           </View>
         </View>
+      </View>
+      <View style={s(c.fullWidth, c.height(48), c.bg(c.grays[40]), c.center)}>
+        <Text style={c.fg(c.grays[90])}>
+          If you have any feedback or suggestions, feel free to email me at{' '}
+          <a
+            style={s(
+              c.keyedProp('textDecoration')('none'),
+              c.fg(c.grays[90]),
+              c.weightBold
+            )}
+            href="mailto:me@mbuffett.com"
+          >
+            me@mbuffett.com
+          </a>
+        </Text>
       </View>
     </View>
   )

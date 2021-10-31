@@ -44,6 +44,13 @@ import { useEffectWithPrevious } from 'app/utils/useEffectWithPrevious'
 import { useComponentLayout } from 'app/utils/useComponentLayout'
 import { ChessColor } from 'app/types/Chess'
 
+export enum PlaybackSpeed {
+  Slow = 0,
+  Normal = 1,
+  Fast = 2,
+  Ludicrous = 3
+}
+
 enum ChessPiece {
   Pawn = 'p',
   Rook = 'r',
@@ -100,9 +107,38 @@ export const PieceView = ({
 
 const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 const rows = [1, 2, 3, 4, 5, 6, 7, 8]
+export const getAnimationDurations = (playbackSpeed: PlaybackSpeed) => {
+  switch (playbackSpeed) {
+    case PlaybackSpeed.Slow:
+      return {
+        moveDuration: 300,
+        fadeDuration: 200,
+        stayDuration: 500
+      }
+    case PlaybackSpeed.Normal:
+      return {
+        moveDuration: 200,
+        fadeDuration: 150,
+        stayDuration: 300
+      }
+    case PlaybackSpeed.Fast:
+      return {
+        moveDuration: 200,
+        fadeDuration: 100,
+        stayDuration: 200
+      }
+    case PlaybackSpeed.Ludicrous:
+      return {
+        moveDuration: 300,
+        fadeDuration: 300,
+        stayDuration: 300
+      }
+  }
+}
 
 export const ChessboardView = ({
   hideColors,
+  playbackSpeed = PlaybackSpeed.Normal,
   currentPosition,
   futurePosition,
   flipped = false,
@@ -111,6 +147,7 @@ export const ChessboardView = ({
   frozen = false
 }: {
   hideColors?: boolean
+  playbackSpeed?: PlaybackSpeed
   currentPosition?: Chess
   futurePosition?: Chess
   flipped?: boolean
@@ -143,10 +180,11 @@ export const ChessboardView = ({
   const moveIndicatorOpacityAnim = useRef(new Animated.Value(0)).current
   biref.highlightMove = useCallback(
     (move: Move, backwards = false, callback: () => void) => {
-      let moveDuration = 200
-      let fadeDuration = 200
+      console.log('playback speed', playbackSpeed)
+      let { fadeDuration, moveDuration, stayDuration } =
+        getAnimationDurations(playbackSpeed)
       setMoveIndicatorColor(
-        move.color == 'b' ? c.hsl(180, 15, 0, 60) : c.hsl(180, 15, 100, 60)
+        move.color == 'b' ? c.hsl(180, 15, 10, 80) : c.hsl(180, 15, 100, 80)
       )
       let [start, end] = backwards ? [move.to, move.from] : [move.from, move.to]
       moveAnim.setValue(getSquareOffset(start))
@@ -157,12 +195,14 @@ export const ChessboardView = ({
           useNativeDriver: false,
           easing: Easing.inOut(Easing.ease)
         }),
+        Animated.delay(stayDuration),
         Animated.timing(moveAnim, {
           toValue: getSquareOffset(end),
           duration: moveDuration,
           useNativeDriver: false,
           easing: Easing.inOut(Easing.ease)
         }),
+        Animated.delay(stayDuration),
         Animated.timing(moveIndicatorOpacityAnim, {
           toValue: 0,
           duration: fadeDuration,
@@ -171,7 +211,7 @@ export const ChessboardView = ({
         })
       ]).start(callback)
     },
-    [chessboardSize, flipped]
+    [chessboardSize, flipped, playbackSpeed]
   )
   // TODO: maybe remove
   const squareHighlightAnims = useMemo(() => {
@@ -269,7 +309,12 @@ export const ChessboardView = ({
           )}
         >
           <View
-            style={s(c.size('50%'), c.round, c.bg(moveIndicatorColor))}
+            style={s(
+              c.size('50%'),
+              c.round,
+              c.bg(moveIndicatorColor),
+              c.shadow(0, 0, 4, 0, c.hsl(0, 0, 0, 50))
+            )}
           ></View>
         </Animated.View>
         <Animated.View // Special animatable View

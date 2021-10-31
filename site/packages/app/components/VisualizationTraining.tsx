@@ -489,7 +489,7 @@ export const VisualizationTraining = () => {
   )
   const speedButtonProps = useCallback(
     (ps) => {
-      const props = {
+      const props: any = {
         onPress: () => {
           setPlaybackSpeed(ps)
         }

@@ -125,6 +125,7 @@ export const ColorTraining = () => {
       setHighScore(score)
       // TODO: message about high score
     }
+    setScore(0)
     setPenalties(0)
     setRemainingTime(0)
   }

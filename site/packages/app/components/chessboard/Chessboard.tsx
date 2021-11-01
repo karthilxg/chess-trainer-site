@@ -180,7 +180,6 @@ export const ChessboardView = ({
   const moveIndicatorOpacityAnim = useRef(new Animated.Value(0)).current
   biref.highlightMove = useCallback(
     (move: Move, backwards = false, callback: () => void) => {
-      console.log('playback speed', playbackSpeed)
       let { fadeDuration, moveDuration, stayDuration } =
         getAnimationDurations(playbackSpeed)
       setMoveIndicatorColor(
@@ -263,7 +262,6 @@ export const ChessboardView = ({
   }
   biref.flashRing = flashRing
   biref.highlightSquare = (square?: Square) => {
-    console.log('setting squares', [square])
     setHighlightedSquares(square ? [square] : [])
   }
   const testRef = useRef(null)

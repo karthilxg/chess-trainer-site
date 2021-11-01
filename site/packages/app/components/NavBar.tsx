@@ -40,6 +40,7 @@ export const NavBar = (props: {}) => {
           const isActive = router.asPath == navItem.path
           return (
             <Pressable
+              key={navItem.title}
               style={s(c.clickable)}
               onPress={() => {
                 router.push(navItem.path)
@@ -60,7 +61,7 @@ export const NavBar = (props: {}) => {
           )
         }),
         (i) => {
-          return <Spacer width={24} />
+          return <Spacer key={i} width={24} />
         }
       )}
     </View>

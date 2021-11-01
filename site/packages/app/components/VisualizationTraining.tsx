@@ -95,14 +95,15 @@ export const VisualizationTraining = () => {
   const [puzzle, setPuzzle] = useState(test ? fakeBlackPuzzle : null)
   const [nextPuzzle, setNextPuzzle] = useState(null)
   const refreshPuzzle = () => {
-    if (nextPuzzle) {
-      setNextPuzzle(null)
-      setPuzzle(nextPuzzle)
-      return
-    }
     ;(async () => {
-      let newPuzzle = await fetchNewPuzzle(ply)
-      setPuzzle(newPuzzle)
+      let p = nextPuzzle
+      if (nextPuzzle) {
+        setNextPuzzle(null)
+      }
+      if (!p) {
+        p = await fetchNewPuzzle(ply)
+      }
+      setPuzzle(p)
       setShowFuturePosition(false)
       setProgressMessage(null)
     })()
@@ -333,7 +334,6 @@ export const VisualizationTraining = () => {
       } else {
         props.style = s(c.buttons.basic)
       }
-      console.log('props', props)
       return props
     },
     [playbackSpeed]

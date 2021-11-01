@@ -96,7 +96,6 @@ export const ColorTraining = () => {
         penaltiesRef.current * 5 * 1000
       setRemainingTime(remainingTime)
       widthAnim.setValue(remainingTime / roundDuration)
-      console.log('remainingTime', remainingTime)
       Animated.timing(widthAnim, {
         toValue: 0.0,
         duration: remainingTime,
@@ -136,7 +135,6 @@ export const ColorTraining = () => {
         // }
         // widthAnim.setValue(1.0)
         // console.log('remainingTimePrevious', remainingTimePrevious)
-        console.log('roundDuration', roundDuration)
         // Animated.timing(widthAnim, {
         //   toValue: 0.0,
         //   duration: remainingTimeRef.current,
@@ -148,7 +146,6 @@ export const ColorTraining = () => {
   )
   const guessColor = useCallback(
     (color: 'light' | 'dark') => {
-      console.log('Guessed a color')
       let correct = chess.squareColor(currentSquare) == color
       biref.flashRing(correct)
       if (correct) {

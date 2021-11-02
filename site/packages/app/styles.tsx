@@ -173,9 +173,9 @@ const grays = {
   10: `hsl(${grayHue}, 39%, 4%)`,
   20: `hsl(${grayHue}, 20%, 8%)`,
   30: `hsl(${grayHue}, 15%, 15%)`,
-  40: `hsl(${grayHue}, 15%, 25%)`,
-  50: `hsl(${grayHue}, 10%, 50%)`,
-  60: `hsl(${grayHue}, 14%, 70%)`,
+  40: `hsl(${grayHue}, 13%, 25%)`,
+  50: `hsl(${grayHue}, 7%, 50%)`,
+  60: `hsl(${grayHue}, 7%, 70%)`,
   70: `hsl(${grayHue}, 9%, 80%)`,
   80: `hsl(${grayHue}, 5%, 90%)`,
   90: `hsl(${grayHue}, 3%, 95%)`

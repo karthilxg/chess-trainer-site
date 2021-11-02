@@ -11,6 +11,7 @@ import { c, s } from 'app/styles'
 import { Spacer } from 'app/Space'
 import { useRouter } from 'next/router'
 import { intersperse } from 'app/utils/intersperse'
+import { useIsMobile } from '../utils/isMobile'
 
 const navItems = [
   {
@@ -24,6 +25,7 @@ const navItems = [
 ]
 export const NavBar = (props: {}) => {
   const router = useRouter()
+  const isMobile = useIsMobile()
   return (
     <View
       style={s(
@@ -32,7 +34,7 @@ export const NavBar = (props: {}) => {
         c.bg(c.grays[30]),
         c.alignCenter,
         c.justifyCenter,
-        c.height(72)
+        c.height(isMobile ? 64 : 72)
       )}
     >
       {intersperse(
@@ -50,8 +52,8 @@ export const NavBar = (props: {}) => {
                 style={s(
                   c.fg(c.colors.textPrimary),
                   c.weightBold,
-                  c.fontSize(16),
-                  c.pb(4),
+                  c.fontSize(isMobile ? 14 : 16),
+                  c.pb(isMobile ? 2 : 4),
                   isActive && s(c.borderBottom(`2px solid ${c.grays[60]}`))
                 )}
               >
@@ -61,7 +63,7 @@ export const NavBar = (props: {}) => {
           )
         }),
         (i) => {
-          return <Spacer key={i} width={24} />
+          return <Spacer key={i} width={isMobile ? 24 : 24} />
         }
       )}
     </View>

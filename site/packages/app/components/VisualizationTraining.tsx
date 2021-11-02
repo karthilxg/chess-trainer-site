@@ -4,8 +4,7 @@ import {
   Platform,
   Pressable,
   useWindowDimensions,
-  View,
-  Modal
+  View
 } from 'react-native'
 // import { ExchangeRates } from "app/ExchangeRate";
 import { c, s } from 'app/styles'
@@ -32,6 +31,9 @@ import { useStorageState } from 'react-storage-hooks'
 import { TrainerLayout } from 'app/components/TrainerLayout'
 import { useIsMobile } from 'app/utils/isMobile'
 import { fakePuzzle, fakeBlackPuzzle } from 'app/mocks/puzzles'
+import KingWhiteIcon from './chessboard/pieces/KingWhiteIcon'
+import KingBlackIcon from './chessboard/pieces/KingBlackIcon'
+import { Modal } from 'app/components/Modal'
 
 const isCheckmate = (move: Move, position: Chess) => {
   position.move(move)
@@ -86,6 +88,7 @@ export const VisualizationTraining = () => {
       : null) as ProgressMessage
   )
   const incrementDecrementStyles = s(c.buttons.basicInverse, c.size(40))
+  const [isDone, setIsDone] = useState(false)
   let [currentPosition, setCurrentPosition] = useState(new Chess())
   let [futurePosition, setFuturePosition] = useState(new Chess())
   let [ply, setPly] = useStorageState(localStorage, 'visualization-ply', 2)
@@ -93,6 +96,7 @@ export const VisualizationTraining = () => {
   let [solutionMoves, setSolutionMoves] = useImmer([] as Move[])
   const [flipped, setFlipped] = useState(false)
   const [puzzle, setPuzzle] = useState(test ? fakeBlackPuzzle : null)
+  const [showHelpButton, setShowHelpButton] = useState(true)
   const [nextPuzzle, setNextPuzzle] = useState(null)
   const refreshPuzzle = () => {
     ;(async () => {
@@ -106,6 +110,7 @@ export const VisualizationTraining = () => {
       setPuzzle(p)
       setShowFuturePosition(false)
       setProgressMessage(null)
+      setIsDone(false)
     })()
   }
   const incrementDecrementTextStyles = s(c.fontSize(24), c.weightRegular)
@@ -178,6 +183,7 @@ export const VisualizationTraining = () => {
         i++
       } else {
         setIsPlaying(false)
+        setFocusedMoveIndex(null)
       }
     }
     animateNextMove()
@@ -204,11 +210,8 @@ export const VisualizationTraining = () => {
               type: ProgressMessageType.Success
             })
           } else {
-            setProgressMessage({
-              message:
-                "You've completed this puzzle! Hit new puzzle to continue training",
-              type: ProgressMessageType.Success
-            })
+            setProgressMessage(null)
+            setIsDone(true)
           }
           return s
         })
@@ -269,6 +272,7 @@ export const VisualizationTraining = () => {
     }
   }, [puzzle, ply])
   const [showFuturePosition, setShowFuturePosition] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
   const nextPreviousStyles = s(c.size(60), c.center)
   const disabledNextPreviousStyles = s(c.buttons.disabled)
   const nextPreviousIconProps = {
@@ -330,9 +334,9 @@ export const VisualizationTraining = () => {
         }
       }
       if (ps == playbackSpeed) {
-        props.style = s(c.buttons.basicInverse)
+        props.style = s(c.buttons.basicInverse, c.br(0))
       } else {
-        props.style = s(c.buttons.basic)
+        props.style = s(c.buttons.basic, c.br(0))
       }
       return props
     },
@@ -362,7 +366,7 @@ export const VisualizationTraining = () => {
                 c.fg(
                   progressMessage.type === ProgressMessageType.Error
                     ? c.colors.failureLight
-                    : c.colors.successColor
+                    : c.primaries[60]
                 ),
                 c.weightBold,
                 c.fontSize(isMobile ? 14 : 16)
@@ -374,50 +378,117 @@ export const VisualizationTraining = () => {
           <Spacer height={12} />
         </>
       )}
-      {!showFuturePosition && isMobile && player}
-      <View style={s()}>
-        <Text
+      {isDone && (
+        <>
+          <Button
+            style={s(isDone ? c.buttons.primary : c.buttons.basic)}
+            onPress={() => {
+              refreshPuzzle()
+            }}
+          >
+            <Text
+              style={s(
+                isDone
+                  ? c.buttons.primary.textStyles
+                  : c.buttons.basic.textStyles
+              )}
+            >
+              <i
+                style={s(
+                  c.fg(isDone ? c.colors.textPrimary : c.colors.textInverse)
+                )}
+                className="fas fa-random"
+              ></i>
+              <Spacer width={8} />
+              New puzzle
+            </Text>
+          </Button>
+          <Spacer height={12} />
+        </>
+      )}
+      {!showFuturePosition && player}
+      {!showFuturePosition && false && (
+        <>
+          <View style={s()}>
+            <Text
+              style={s(
+                c.weightSemiBold,
+                c.fg(c.colors.textPrimary),
+                c.fontSize(isMobile ? 14 : 16)
+              )}
+            >
+              {futurePosition.turn() == 'b' ? 'Black' : 'White'} to move.
+              Visualize the following, or press play, then make the best move.
+              Go to settings to adjust the difficulty.
+            </Text>
+            <Spacer height={12} />
+            <Text>
+              <MoveList
+                focusedMoveIndex={focusedMoveIndex}
+                moveList={hiddenMoves}
+                onMoveClick={(move, i) => {
+                  setFocusedMoveIndex(i)
+                  biref.highlightMove(move)
+                }}
+              />
+            </Text>
+          </View>
+          <Spacer height={24} />
+        </>
+      )}
+      {!showFuturePosition && (
+        <View
           style={s(
-            c.weightSemiBold,
-            c.fg(c.colors.textPrimary),
-            c.fontSize(isMobile ? 14 : 16)
+            c.overflowHidden,
+            c.fullWidth,
+            c.row,
+            c.bg(c.grays[50]),
+            c.br(4),
+            c.mb(12)
           )}
         >
-          {futurePosition.turn() == 'b' ? 'Black' : 'White'} to move. Visualize
-          the following, or press play, then make the best move. Go to settings
-          to adjust the difficulty.
-        </Text>
-        <Spacer height={12} />
-        <Text>
-          <MoveList
-            focusedMoveIndex={focusedMoveIndex}
-            moveList={hiddenMoves}
-            onMoveClick={(move, i) => {
-              setFocusedMoveIndex(i)
-              biref.highlightMove(move)
-            }}
-          />
-        </Text>
-      </View>
-      <Spacer height={24} />
-      {!showFuturePosition && !isMobile && player}
+          <View style={s(c.column, c.grow, c.alignStretch, c.noBasis)}>
+            <View
+              style={s(
+                c.bg(c.grays[40]),
+                c.height(48),
+                c.center,
+                c.borderRight(`1px solid ${c.grays[50]}`)
+              )}
+            >
+              <Text style={s(c.fg(c.colors.textPrimary), c.weightBold)}>
+                Turn
+              </Text>
+            </View>
+            <View style={s(c.size(40), c.selfCenter, c.my(12))}>
+              {futurePosition.turn() == 'b' ? (
+                <KingBlackIcon />
+              ) : (
+                <KingWhiteIcon />
+              )}
+            </View>
+          </View>
+          <View style={s(c.column, c.grow, c.alignStretch, c.noBasis)}>
+            <View style={s(c.bg(c.grays[40]), c.height(48), c.center)}>
+              <Text style={s(c.fg(c.colors.textPrimary), c.weightBold)}>
+                Moves hidden
+              </Text>
+            </View>
+            <View style={s(c.size(40), c.selfCenter, c.my(12))}>
+              <Text
+                style={s(
+                  c.fg(c.colors.textPrimary),
+                  c.weightSemiBold,
+                  c.fontSize(32)
+                )}
+              >
+                {ply}
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
       <View style={s(c.row, c.fullWidth, c.height(48))}>
-        <Button
-          style={s(c.buttons.basic, c.noBasis, c.grow)}
-          onPress={() => {
-            refreshPuzzle()
-          }}
-        >
-          <Text style={s(c.buttons.basic.textStyles)}>
-            <i
-              style={s(c.fg(c.colors.textInverse))}
-              className="fas fa-random"
-            ></i>
-            <Spacer width={8} />
-            New puzzle
-          </Text>
-        </Button>
-        <Spacer height={12} width={12} isMobile={isMobile} />
         <Button
           style={s(c.buttons.basic, c.noBasis, c.grow)}
           onPress={() => {
@@ -437,7 +508,21 @@ export const VisualizationTraining = () => {
               className="fas fa-external-link-alt"
             ></i>
             <Spacer width={8} />
-            Lichess
+            Open on lichess
+          </Text>
+        </Button>
+        <Spacer height={12} width={12} isMobile={isMobile} />
+        <Button
+          style={s(c.buttons.basic, c.size(48))}
+          onPress={() => {
+            setHelpOpen(true)
+          }}
+        >
+          <Text style={s(c.buttons.basic.textStyles)}>
+            <i
+              style={s(c.fg(c.colors.textInverse))}
+              className="fas fa-circle-question"
+            ></i>
           </Text>
         </Button>
         <Spacer height={12} width={12} isMobile={isMobile} />
@@ -450,6 +535,11 @@ export const VisualizationTraining = () => {
           <i style={s(c.fg(c.colors.textInverse))} className="fas fa-gear"></i>
         </Button>
       </View>
+      {showHelpButton && (
+        <>
+          <Spacer height={12} width={12} isMobile={isMobile} />
+        </>
+      )}
       <Spacer height={12} />
       {debugButtons && (
         <>
@@ -487,112 +577,96 @@ export const VisualizationTraining = () => {
         </>
       )}
       <Modal
-        animationType="fade"
-        transparent={true}
-        visible={settingsOpen}
-        onRequestClose={() => {
-          setSettingsOpen(false)
+        onClose={() => {
+          setHelpOpen(false)
         }}
+        visible={helpOpen}
       >
-        <Pressable
-          onPress={() => {
-            setSettingsOpen(false)
-          }}
-          style={s(c.center, { flex: 1 }, c.bg('hsla(0, 0%, 0%, .5)'), c.br(2))}
-        >
-          <Pressable
-            onPress={(e) => {
-              e.stopPropagation()
-            }}
+        <View style={s(c.row, c.px(12), c.py(12), c.alignCenter)}>
+          <Text
             style={s(
-              c.bg(c.grays[70]),
-              c.br(2),
-              c.column,
-              c.unclickable,
-              c.width(400),
-              c.maxWidth('calc(100% - 50px)')
+              c.weightSemiBold,
+              c.fg(c.colors.textInverse),
+              c.lineHeight(22)
             )}
           >
-            <View style={s(c.row, c.px(12), c.height(40), c.alignCenter)}>
-              <Text
-                style={s(
-                  c.fontSize(20),
-                  c.weightBold,
-                  c.fg(c.colors.textInverse)
-                )}
-              >
-                Settings
-              </Text>
-            </View>
-            <View
-              style={s(c.fullWidth, c.height(1), c.bg('black'), c.opacity(15))}
-            ></View>
-            <View style={s(c.px(12), c.pt(24), c.pb(24))}>
-              <Text
-                style={s(
-                  c.fg(c.colors.textInverse),
-                  c.fontSize(18),
-                  c.weightBold
-                )}
-              >
-                Hidden moves
-              </Text>
-              <Spacer height={12} />
-              <View style={s(c.row, c.alignCenter)}>
-                <Button
-                  onPress={() => {
-                    setPly(Math.max(1, ply - 1))
-                  }}
-                  style={s(incrementDecrementStyles)}
-                >
-                  -
-                </Button>
-                <Spacer width={12} />
-                <View style={s(c.column, c.alignCenter, c.width(40))}>
-                  <Text
-                    style={s(
-                      c.fg(c.colors.textInverse),
-                      c.fontSize(24),
-                      c.weightBold
-                    )}
-                  >
-                    {ply}
-                  </Text>
-                </View>
-                <Spacer width={12} />
-                <Button
-                  onPress={() => {
-                    setPly(ply + 1)
-                  }}
-                  style={s(incrementDecrementStyles)}
-                >
-                  +
-                </Button>
-              </View>
-              <Spacer height={24} />
+            Press play to see the next {ply} moves played out, but not
+            persisted, on the board. At the end of the moves, there is a winning
+            tactic. If you can't see the tactic, you can reduce the number of
+            moves in settings, or you can view the puzzle on lichess.
+          </Text>
+        </View>
+      </Modal>
+      <Modal
+        onClose={() => {
+          setSettingsOpen(false)
+        }}
+        visible={settingsOpen}
+      >
+        <View style={s(c.row, c.px(12), c.height(40), c.alignCenter)}>
+          <Text
+            style={s(c.fontSize(20), c.weightBold, c.fg(c.colors.textInverse))}
+          >
+            Settings
+          </Text>
+        </View>
+        <View
+          style={s(c.fullWidth, c.height(1), c.bg('black'), c.opacity(15))}
+        ></View>
+        <View style={s(c.px(12), c.pt(24), c.pb(24))}>
+          <Text
+            style={s(c.fg(c.colors.textInverse), c.fontSize(18), c.weightBold)}
+          >
+            Hidden moves
+          </Text>
+          <Spacer height={12} />
+          <View style={s(c.row, c.alignCenter)}>
+            <Button
+              onPress={() => {
+                setPly(Math.max(1, ply - 1))
+              }}
+              style={s(incrementDecrementStyles)}
+            >
+              -
+            </Button>
+            <Spacer width={12} />
+            <View style={s(c.column, c.alignCenter, c.width(40))}>
               <Text
                 style={s(
                   c.fg(c.colors.textInverse),
-                  c.fontSize(18),
+                  c.fontSize(24),
                   c.weightBold
                 )}
               >
-                Playback speed
+                {ply}
               </Text>
-              <Spacer height={12} />
-              <View>
-                <Button {...speedButtonProps(PlaybackSpeed.Slow)}>Slow</Button>
-                <Button {...speedButtonProps(PlaybackSpeed.Normal)}>
-                  Normal
-                </Button>
-                <Button {...speedButtonProps(PlaybackSpeed.Fast)}>Fast</Button>
-                <Button {...speedButtonProps(PlaybackSpeed.Ludicrous)}>
-                  Ludicrous
-                </Button>
-              </View>
             </View>
-          </Pressable>
-        </Pressable>
+            <Spacer width={12} />
+            <Button
+              onPress={() => {
+                setPly(ply + 1)
+              }}
+              style={s(incrementDecrementStyles)}
+            >
+              +
+            </Button>
+          </View>
+          <Spacer height={24} />
+          <Text
+            style={s(c.fg(c.colors.textInverse), c.fontSize(18), c.weightBold)}
+          >
+            Playback speed
+          </Text>
+          <Spacer height={12} />
+          <View style={s(c.column, c.br(2), c.overflowHidden)}>
+            <Button {...speedButtonProps(PlaybackSpeed.Slow)}>Slow</Button>
+            <Button {...speedButtonProps(PlaybackSpeed.Normal)}>Normal</Button>
+            <Button {...speedButtonProps(PlaybackSpeed.Fast)}>Fast</Button>
+            <Button {...speedButtonProps(PlaybackSpeed.Ludicrous)}>
+              Ludicrous
+            </Button>
+          </View>
+        </View>
       </Modal>
     </TrainerLayout>
   )

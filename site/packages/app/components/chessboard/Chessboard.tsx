@@ -51,6 +51,19 @@ export enum PlaybackSpeed {
   Ludicrous = 3
 }
 
+export const getPlaybackSpeedDescription = (ps: PlaybackSpeed) => {
+  switch (ps) {
+    case PlaybackSpeed.Slow:
+      return 'Slow'
+    case PlaybackSpeed.Normal:
+      return 'Normal'
+    case PlaybackSpeed.Fast:
+      return 'Fast'
+    case PlaybackSpeed.Ludicrous:
+      return 'Ludicrous'
+  }
+}
+
 enum ChessPiece {
   Pawn = 'p',
   Rook = 'r',
@@ -224,7 +237,6 @@ export const ChessboardView = ({
   const [highlightedSquares, setHighlightedSquares] = useImmer([] as Square[])
   useEffectWithPrevious(
     (previousHighlightedSquares = []) => {
-      console.log('new highlighted squares', highlightedSquares)
       let highlightFadeDuration = 100
       previousHighlightedSquares.map((sq) => {
         Animated.timing(squareHighlightAnims[sq], {
@@ -235,7 +247,7 @@ export const ChessboardView = ({
       })
       highlightedSquares.map((sq) => {
         Animated.timing(squareHighlightAnims[sq], {
-          toValue: 0.3,
+          toValue: 0.8,
           duration: animDuration,
           useNativeDriver: false
         }).start()
@@ -403,7 +415,7 @@ export const ChessboardView = ({
                           {
                             opacity: squareHighlightAnims[square]
                           },
-                          c.bg('hsl(80, 50%, 50%)'),
+                          c.bg(c.primaries[60]),
                           c.absolute,
                           c.size('100%'),
                           c.zIndex(4)

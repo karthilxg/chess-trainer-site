@@ -12,6 +12,7 @@ import { Spacer } from 'app/Space'
 import {
   ChessboardView,
   getAnimationDurations,
+  getPlaybackSpeedDescription,
   PlaybackSpeed
 } from 'app/components/chessboard/Chessboard'
 import axios from 'axios'
@@ -19,7 +20,15 @@ import { Helmet } from 'react-helmet'
 import { useImmer } from 'use-immer'
 import { Chess, Move } from '@lubert/chess.ts'
 import client from 'app/client'
-import { cloneDeep, isEmpty, isNil, takeRight } from 'lodash'
+import {
+  cloneDeep,
+  isEmpty,
+  isNil,
+  takeRight,
+  drop,
+  dropRight,
+  indexOf
+} from 'lodash'
 import { MoveList } from './MoveList'
 import { LichessPuzzle } from 'app/models'
 import { ChessboardBiref } from 'app/types/ChessboardBiref'
@@ -34,6 +43,7 @@ import { fakePuzzle, fakeBlackPuzzle } from 'app/mocks/puzzles'
 import KingWhiteIcon from './chessboard/pieces/KingWhiteIcon'
 import KingBlackIcon from './chessboard/pieces/KingBlackIcon'
 import { Modal } from 'app/components/Modal'
+import { intersperse } from '../utils/intersperse'
 
 const isCheckmate = (move: Move, position: Chess) => {
   position.move(move)
@@ -61,18 +71,118 @@ const fensTheSame = (x, y) => {
   }
 }
 
-const fetchNewPuzzle = async (maxPly: number): Promise<LichessPuzzle> => {
+interface PuzzleFetchOptions {
+  ratingGte?: number
+  ratingLte?: number
+  maxPly?: number
+}
+
+const fetchNewPuzzle = async ({
+  ratingGte,
+  ratingLte,
+  maxPly
+}: PuzzleFetchOptions): Promise<LichessPuzzle> => {
   if (test) {
     return cloneDeep(fakePuzzle)
   }
   try {
-    let response = await client.post('/api/v1/tactic', {
-      max_ply: maxPly
+    let response = await client.post('/api/v2/tactic', {
+      maxPly,
+      ratingGte,
+      ratingLte
     })
-    return response.data as LichessPuzzle
+    // @ts-ignore
+    console.log(response.data.count)
+    // @ts-ignore
+    return response.data.tactic as LichessPuzzle
   } catch (error) {
     console.log(error)
   }
+}
+
+enum PuzzleDifficulty {
+  Beginner = 'Beginner',
+  Novice = 'Novice',
+  Intermediate = 'Intermediate',
+  Expert = 'Hard',
+  Magnus = 'Magnus'
+}
+
+const allDifficulties = [
+  PuzzleDifficulty.Beginner,
+  PuzzleDifficulty.Novice,
+  PuzzleDifficulty.Intermediate,
+  PuzzleDifficulty.Expert,
+  PuzzleDifficulty.Magnus
+]
+
+const getPuzzleDifficultyRating = (pd: PuzzleDifficulty) => {
+  switch (pd) {
+    case PuzzleDifficulty.Beginner:
+      return 0
+    case PuzzleDifficulty.Novice:
+      return 800
+    case PuzzleDifficulty.Intermediate:
+      return 1200
+    case PuzzleDifficulty.Expert:
+      return 1800
+    case PuzzleDifficulty.Magnus:
+      return 2500
+  }
+}
+
+const SettingsOption = <T,>({
+  choices,
+  onSelect,
+  renderChoice,
+  activeChoice
+}: {
+  choices: T[]
+  activeChoice: T
+  onSelect: (_: T) => void
+  renderChoice: (_: T) => JSX.Element
+}) => {
+  return (
+    <View style={s(c.ml(12))}>
+      {intersperse(
+        choices.map((choice, i) => {
+          const active = choice === activeChoice
+          return (
+            <Pressable
+              onPress={() => {
+                onSelect(choice)
+              }}
+              key={i}
+              style={s(c.row)}
+            >
+              <i
+                style={s(c.fg(c.colors.textPrimary))}
+                className={active ? `fas fa-circle` : `fa-regular fa-circle`}
+              ></i>
+              <Spacer width={12} />
+              <Text style={s(c.fg(c.colors.textPrimary), c.weightSemiBold)}>
+                {renderChoice(choice)}
+              </Text>
+            </Pressable>
+          )
+        }),
+        (i) => {
+          return <Spacer key={`space-${i}`} height={12} />
+        }
+      )}
+    </View>
+  )
+}
+const SettingsTitle = ({ text }) => {
+  return (
+    <View
+      style={s(c.fullWidth, c.px(12), c.py(12), c.bg(c.grays[20]), c.br(2))}
+    >
+      <Text style={s(c.fg(c.colors.textPrimary), c.fontSize(18), c.weightBold)}>
+        {text}
+      </Text>
+    </View>
+  )
 }
 
 export const VisualizationTraining = () => {
@@ -87,17 +197,46 @@ export const VisualizationTraining = () => {
       ? { message: 'Test message', type: ProgressMessageType.Error }
       : null) as ProgressMessage
   )
-  const incrementDecrementStyles = s(c.buttons.basicInverse, c.size(40))
+  const incrementDecrementStyles = s(c.buttons.basic, c.size(40))
+  const incrementDecrementTextStyles = s(
+    c.fg(c.colors.textInverse),
+    c.fontSize(14)
+  )
   const [isDone, setIsDone] = useState(false)
   let [currentPosition, setCurrentPosition] = useState(new Chess())
   let [futurePosition, setFuturePosition] = useState(new Chess())
   let [ply, setPly] = useStorageState(localStorage, 'visualization-ply', 2)
   let [hiddenMoves, setHiddenMoves] = useState(null)
   let [solutionMoves, setSolutionMoves] = useImmer([] as Move[])
+  let [ratingGte, setRatingGte] = useStorageState(
+    localStorage,
+    'puzzle-rating-gte',
+    PuzzleDifficulty.Beginner
+  )
+  let [ratingLte, setRatingLte] = useStorageState(
+    localStorage,
+    'puzzle-rating-lte',
+    PuzzleDifficulty.Intermediate
+  )
+  const fetchOptions = useMemo(() => {
+    return {
+      ratingGte: getPuzzleDifficultyRating(ratingGte),
+      ratingLte: getPuzzleDifficultyRating(ratingLte),
+      maxPly: ply
+    }
+  }, [ratingGte, ratingLte, ply])
+  useEffect(() => {
+    setNextPuzzle(null)
+  }, [fetchOptions])
   const [flipped, setFlipped] = useState(false)
   const [puzzle, setPuzzle] = useState(test ? fakeBlackPuzzle : null)
   const [showHelpButton, setShowHelpButton] = useState(true)
   const [nextPuzzle, setNextPuzzle] = useState(null)
+  const resetState = useCallback(() => {
+    setShowFuturePosition(false)
+    setProgressMessage(null)
+    setIsDone(false)
+  }, [])
   const refreshPuzzle = () => {
     ;(async () => {
       let p = nextPuzzle
@@ -105,25 +244,27 @@ export const VisualizationTraining = () => {
         setNextPuzzle(null)
       }
       if (!p) {
-        p = await fetchNewPuzzle(ply)
+        p = await fetchNewPuzzle(fetchOptions)
       }
       setPuzzle(p)
-      setShowFuturePosition(false)
-      setProgressMessage(null)
-      setIsDone(false)
+      resetState()
     })()
   }
-  const incrementDecrementTextStyles = s(c.fontSize(24), c.weightRegular)
   useEffect(() => {
     if (puzzle === null) {
       refreshPuzzle()
     }
     if (puzzle && nextPuzzle == null) {
       ;(async () => {
-        setNextPuzzle(await fetchNewPuzzle(ply))
+        setNextPuzzle(await fetchNewPuzzle(fetchOptions))
       })()
     }
   }, [puzzle])
+  useEffect(() => {
+    resetState()
+    setPuzzle(null)
+    setNextPuzzle(null)
+  }, [ratingGte, ratingLte])
   // TODO: helper to make state and ref
   const [isPlaying, setIsPlaying, isPlayingRef] = useState(false)
   const [focusedMoveIndex, setFocusedMoveIndex] = useState(null)
@@ -273,8 +414,18 @@ export const VisualizationTraining = () => {
   }, [puzzle, ply])
   const [showFuturePosition, setShowFuturePosition] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
+  const [showNotation, setShowNotation] = useStorageState(
+    localStorage,
+    'show-notation-visualization-trainer',
+    false
+  )
   const nextPreviousStyles = s(c.size(60), c.center)
   const disabledNextPreviousStyles = s(c.buttons.disabled)
+  const ratingTitleStyles = s(
+    c.fg(c.colors.textPrimary),
+    c.fontSize(16),
+    c.weightSemiBold
+  )
   const nextPreviousIconProps = {
     style: s(c.fg(c.colors.textInverse)),
     size: 28
@@ -407,87 +558,122 @@ export const VisualizationTraining = () => {
         </>
       )}
       {!showFuturePosition && player}
-      {!showFuturePosition && false && (
-        <>
-          <View style={s()}>
-            <Text
-              style={s(
-                c.weightSemiBold,
-                c.fg(c.colors.textPrimary),
-                c.fontSize(isMobile ? 14 : 16)
-              )}
-            >
-              {futurePosition.turn() == 'b' ? 'Black' : 'White'} to move.
-              Visualize the following, or press play, then make the best move.
-              Go to settings to adjust the difficulty.
-            </Text>
+      {!showFuturePosition &&
+        (showNotation ? (
+          <>
+            <MoveList
+              focusedMoveIndex={focusedMoveIndex}
+              onHideNotation={() => {
+                setShowNotation(false)
+              }}
+              moveList={hiddenMoves}
+              onMoveClick={(move, i) => {
+                setFocusedMoveIndex(i)
+                biref.highlightMove(move)
+              }}
+            />
             <Spacer height={12} />
-            <Text>
-              <MoveList
-                focusedMoveIndex={focusedMoveIndex}
-                moveList={hiddenMoves}
-                onMoveClick={(move, i) => {
-                  setFocusedMoveIndex(i)
-                  biref.highlightMove(move)
-                }}
+          </>
+        ) : (
+          <View
+            style={s(
+              c.overflowHidden,
+              c.fullWidth,
+              c.column,
+              c.bg(c.grays[20]),
+              c.br(4),
+              c.mb(12)
+            )}
+          >
+            <View style={s(c.fullWidth, c.row)}>
+              <View style={s(c.column, c.grow, c.alignStretch, c.noBasis)}>
+                <View
+                  style={s(
+                    c.bg(c.grays[20]),
+                    c.height(isMobile ? 36 : 48),
+                    c.center
+                  )}
+                >
+                  <Text style={s(c.fg(c.colors.textPrimary), c.weightBold)}>
+                    Turn
+                  </Text>
+                </View>
+                <View
+                  style={s(c.height(1), c.bg(c.grays[30]), c.flexGrow(0))}
+                />
+                <View style={s(c.size(40), c.selfCenter, c.my(12))}>
+                  {futurePosition.turn() == 'b' ? (
+                    <KingBlackIcon />
+                  ) : (
+                    <KingWhiteIcon />
+                  )}
+                </View>
+              </View>
+              <View
+                style={s(
+                  c.width(1),
+                  c.bg(c.grays[30]),
+                  c.height(isMobile ? 36 : 48)
+                )}
               />
-            </Text>
-          </View>
-          <Spacer height={24} />
-        </>
-      )}
-      {!showFuturePosition && (
-        <View
-          style={s(
-            c.overflowHidden,
-            c.fullWidth,
-            c.row,
-            c.bg(c.grays[50]),
-            c.br(4),
-            c.mb(12)
-          )}
-        >
-          <View style={s(c.column, c.grow, c.alignStretch, c.noBasis)}>
-            <View
-              style={s(
-                c.bg(c.grays[40]),
-                c.height(48),
-                c.center,
-                c.borderRight(`1px solid ${c.grays[50]}`)
-              )}
+              <View style={s(c.column, c.grow, c.alignStretch, c.noBasis)}>
+                <View
+                  style={s(
+                    c.bg(c.grays[20]),
+                    c.height(isMobile ? 36 : 48),
+                    c.center
+                  )}
+                >
+                  <Text style={s(c.fg(c.colors.textPrimary), c.weightBold)}>
+                    Moves hidden
+                  </Text>
+                </View>
+                <View
+                  style={s(c.height(1), c.bg(c.grays[30]), c.flexGrow(0))}
+                />
+                <View style={s(c.size(40), c.selfCenter, c.my(12))}>
+                  <Text
+                    style={s(
+                      c.fg(c.colors.textPrimary),
+                      c.weightSemiBold,
+                      c.fontSize(32)
+                    )}
+                  >
+                    {ply}
+                  </Text>
+                </View>
+              </View>
+            </View>
+            <Pressable
+              style={s(c.center, c.selfCenter, c.fullWidth, c.py(12))}
+              onPress={() => {
+                setShowNotation(true)
+              }}
             >
               <Text style={s(c.fg(c.colors.textPrimary), c.weightBold)}>
-                Turn
+                <i
+                  style={s(
+                    c.fg(c.colors.textPrimary),
+                    c.opacity(30),
+                    c.fontSize(16)
+                  )}
+                  className={`fas fa-angle-down`}
+                ></i>
+                <Spacer width={8} />
+                Show notation
+                <Spacer width={8} />
+                <i
+                  style={s(
+                    c.fg(c.colors.textPrimary),
+                    c.opacity(30),
+                    c.fontSize(16)
+                  )}
+                  className={`fas fa-angle-down`}
+                ></i>
               </Text>
-            </View>
-            <View style={s(c.size(40), c.selfCenter, c.my(12))}>
-              {futurePosition.turn() == 'b' ? (
-                <KingBlackIcon />
-              ) : (
-                <KingWhiteIcon />
-              )}
-            </View>
+            </Pressable>
           </View>
-          <View style={s(c.column, c.grow, c.alignStretch, c.noBasis)}>
-            <View style={s(c.bg(c.grays[40]), c.height(48), c.center)}>
-              <Text style={s(c.fg(c.colors.textPrimary), c.weightBold)}>
-                Moves hidden
-              </Text>
-            </View>
-            <View style={s(c.size(40), c.selfCenter, c.my(12))}>
-              <Text
-                style={s(
-                  c.fg(c.colors.textPrimary),
-                  c.weightSemiBold,
-                  c.fontSize(32)
-                )}
-              >
-                {ply}
-              </Text>
-            </View>
-          </View>
-        </View>
-      )}
+        ))}
       <View style={s(c.row, c.fullWidth, c.height(48))}>
         <Button
           style={s(c.buttons.basic, c.noBasis, c.grow)}
@@ -586,7 +772,7 @@ export const VisualizationTraining = () => {
           <Text
             style={s(
               c.weightSemiBold,
-              c.fg(c.colors.textInverse),
+              c.fg(c.colors.textPrimary),
               c.lineHeight(22)
             )}
           >
@@ -603,23 +789,9 @@ export const VisualizationTraining = () => {
         }}
         visible={settingsOpen}
       >
-        <View style={s(c.row, c.px(12), c.height(40), c.alignCenter)}>
-          <Text
-            style={s(c.fontSize(20), c.weightBold, c.fg(c.colors.textInverse))}
-          >
-            Settings
-          </Text>
-        </View>
-        <View
-          style={s(c.fullWidth, c.height(1), c.bg('black'), c.opacity(15))}
-        ></View>
-        <View style={s(c.px(12), c.pt(24), c.pb(24))}>
-          <Text
-            style={s(c.fg(c.colors.textInverse), c.fontSize(18), c.weightBold)}
-          >
-            Hidden moves
-          </Text>
-          <Spacer height={12} />
+        <View style={s(c.px(12), c.pt(12), c.pb(24))}>
+          <SettingsTitle text={'Hidden moves'} />
+          <Spacer height={24} />
           <View style={s(c.row, c.alignCenter)}>
             <Button
               onPress={() => {
@@ -627,13 +799,16 @@ export const VisualizationTraining = () => {
               }}
               style={s(incrementDecrementStyles)}
             >
-              -
+              <i
+                style={s(incrementDecrementTextStyles)}
+                className="fas fa-minus"
+              ></i>
             </Button>
             <Spacer width={12} />
             <View style={s(c.column, c.alignCenter, c.width(40))}>
               <Text
                 style={s(
-                  c.fg(c.colors.textInverse),
+                  c.fg(c.colors.textPrimary),
                   c.fontSize(24),
                   c.weightBold
                 )}
@@ -648,23 +823,71 @@ export const VisualizationTraining = () => {
               }}
               style={s(incrementDecrementStyles)}
             >
-              +
+              <i
+                style={s(incrementDecrementTextStyles)}
+                className="fas fa-plus"
+              ></i>
             </Button>
           </View>
           <Spacer height={24} />
-          <Text
-            style={s(c.fg(c.colors.textInverse), c.fontSize(18), c.weightBold)}
-          >
-            Playback speed
-          </Text>
+          <SettingsTitle text={'Playback speed'} />
+          <Spacer height={24} />
+          <SettingsOption
+            choices={[
+              PlaybackSpeed.Slow,
+              PlaybackSpeed.Normal,
+              PlaybackSpeed.Fast,
+              PlaybackSpeed.Ludicrous
+            ]}
+            activeChoice={playbackSpeed}
+            onSelect={(playbackSpeed) => {
+              setPlaybackSpeed(playbackSpeed)
+            }}
+            renderChoice={(c) => {
+              return <Text>{getPlaybackSpeedDescription(c)}</Text>
+            }}
+          />
+          <Spacer height={24} />
+          <SettingsTitle text={'Rating'} />
           <Spacer height={12} />
-          <View style={s(c.column, c.br(2), c.overflowHidden)}>
-            <Button {...speedButtonProps(PlaybackSpeed.Slow)}>Slow</Button>
-            <Button {...speedButtonProps(PlaybackSpeed.Normal)}>Normal</Button>
-            <Button {...speedButtonProps(PlaybackSpeed.Fast)}>Fast</Button>
-            <Button {...speedButtonProps(PlaybackSpeed.Ludicrous)}>
-              Ludicrous
-            </Button>
+          <View style={s(c.row, c.ml(12))}>
+            <View style={s(c.column)}>
+              <Text style={s(ratingTitleStyles)}>Min</Text>
+              <Spacer height={12} />
+              <SettingsOption
+                choices={dropRight(allDifficulties, 1)}
+                activeChoice={ratingGte}
+                onSelect={(rating) => {
+                  setRatingGte(rating)
+                  let idx = indexOf(allDifficulties, rating)
+                  if (idx >= indexOf(allDifficulties, ratingLte)) {
+                    setRatingLte(allDifficulties[idx + 1])
+                  }
+                }}
+                renderChoice={(c) => {
+                  return <Text>{getPuzzleDifficultyRating(c)}</Text>
+                }}
+              />
+            </View>
+            <Spacer width={24} />
+            <View style={s(c.column)}>
+              <Text style={s(ratingTitleStyles)}>Max</Text>
+              <Spacer height={12} />
+              <SettingsOption
+                choices={drop(allDifficulties, 1)}
+                activeChoice={ratingLte}
+                onSelect={(rating) => {
+                  setRatingLte(rating)
+                  let idx = indexOf(allDifficulties, rating)
+                  if (idx <= indexOf(allDifficulties, ratingGte)) {
+                    setRatingGte(allDifficulties[idx - 1])
+                  }
+                }}
+                renderChoice={(c) => {
+                  return <Text>{getPuzzleDifficultyRating(c)}</Text>
+                }}
+              />
+            </View>
           </View>
         </View>
       </Modal>

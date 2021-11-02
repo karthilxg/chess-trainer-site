@@ -31,7 +31,6 @@ export const NavBar = (props: {}) => {
       style={s(
         c.row,
         c.px(16),
-        c.bg(c.grays[30]),
         c.alignCenter,
         c.justifyCenter,
         c.height(isMobile ? 64 : 72)

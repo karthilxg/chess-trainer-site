@@ -64,7 +64,7 @@ export const Modal = ({
             e.stopPropagation()
           }}
           style={s(
-            c.bg(c.grays[70]),
+            c.bg(c.grays[15]),
             c.br(2),
             c.column,
             c.unclickable,

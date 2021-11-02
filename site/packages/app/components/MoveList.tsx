@@ -17,11 +17,13 @@ import { Move } from '@lubert/chess.ts'
 export const MoveList = ({
   moveList,
   focusedMoveIndex,
-  onMoveClick
+  onMoveClick,
+  onHideNotation
 }: {
   moveList: Move[]
   focusedMoveIndex?: number
   onMoveClick: (move: Move, _: number) => void
+  onHideNotation: () => void
 }) => {
   let pairs = []
   let currentPair = []
@@ -44,31 +46,43 @@ export const MoveList = ({
   }
   const moveStyles = s(
     c.width(80),
+    c.fullHeight,
     c.clickable,
+    c.selfStretch,
+    c.alignStart,
+    c.justifyCenter,
+    c.column,
     c.fontSize(18),
     c.weightSemiBold,
     c.fg(c.colors.textPrimary)
   )
   return (
-    <View style={s(c.column)}>
+    <View style={s(c.column, c.bg(c.grays[20]), c.br(2))}>
       {pairs.map((pair, i) => {
         const [{ move: whiteMove, i: whiteI }, { move: blackMove, i: blackI }] =
           pair
         const activeMoveStyles = s(c.weightBlack, c.fontSize(20))
         return (
-          <View key={i} style={s(c.column)}>
-            <View style={s(c.row, c.alignEnd, c.height(32))}>
-              <Text
+          <View key={i} style={s(c.column, c.overflowHidden)}>
+            <View style={s(c.row, c.alignStretch, c.height(48))}>
+              <View
                 style={s(
-                  c.fg(c.colors.textPrimary),
-                  c.fontSize(18),
-                  c.weightSemiBold,
-                  c.width(32)
+                  c.width(48),
+                  c.center,
+                  c.borderRight(`1px solid ${c.grays[30]}`)
                 )}
               >
-                {i + 1}
-              </Text>
-              <Spacer width={8} />
+                <Text
+                  style={s(
+                    c.fg(c.colors.textPrimary),
+                    c.fontSize(18),
+                    c.weightSemiBold
+                  )}
+                >
+                  {i + 1}
+                </Text>
+              </View>
+              <Spacer width={24} />
               <Pressable
                 onPress={() => {
                   onMoveClick(whiteMove, whiteI)
@@ -98,10 +112,33 @@ export const MoveList = ({
                 </Text>
               </Pressable>
             </View>
-            {i != pairs.length - 1 && <Spacer height={4} />}
+            {i != pairs.length - 1 && (
+              <View style={s(c.height(1), c.bg(c.grays[30]))} />
+            )}
           </View>
         )
       })}
+      <View style={s(c.height(1), c.bg(c.grays[30]))} />
+      <Pressable
+        style={s(c.center, c.selfCenter, c.fullWidth, c.py(12))}
+        onPress={() => {
+          onHideNotation()
+        }}
+      >
+        <Text style={s(c.fg(c.colors.textPrimary), c.weightBold)}>
+          <i
+            style={s(c.fg(c.colors.textPrimary), c.opacity(30), c.fontSize(16))}
+            className={`fas fa-angle-up`}
+          ></i>
+          <Spacer width={8} />
+          Hide notation
+          <Spacer width={8} />
+          <i
+            style={s(c.fg(c.colors.textPrimary), c.opacity(30), c.fontSize(16))}
+            className={`fas fa-angle-up`}
+          ></i>
+        </Text>
+      </Pressable>
     </View>
   )
 }

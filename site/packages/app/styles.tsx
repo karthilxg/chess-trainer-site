@@ -86,6 +86,7 @@ const size = (x: string | number) => {
 
 const selfStart = keyedProp('alignSelf')('flex-start')
 const selfCenter = keyedProp('alignSelf')('center')
+const selfStretch = keyedProp('alignSelf')('stretch')
 const selfEnd = keyedProp('alignSelf')('flex-end')
 const alignStart = keyedProp('alignItems')('flex-start')
 const alignEnd = keyedProp('alignItems')('flex-end')
@@ -169,17 +170,28 @@ const black = (opacity: number) => {
 }
 
 const grayHue = 229
-const grays = {
-  10: `hsl(${grayHue}, 39%, 4%)`,
-  20: `hsl(${grayHue}, 20%, 8%)`,
-  30: `hsl(${grayHue}, 15%, 15%)`,
-  40: `hsl(${grayHue}, 13%, 25%)`,
-  50: `hsl(${grayHue}, 7%, 50%)`,
-  60: `hsl(${grayHue}, 7%, 70%)`,
-  70: `hsl(${grayHue}, 9%, 80%)`,
-  80: `hsl(${grayHue}, 5%, 90%)`,
-  90: `hsl(${grayHue}, 3%, 95%)`
+// const grays = {
+//   10: `hsl(${grayHue}, 39%, 4%)`,
+//   20: `hsl(${grayHue}, 20%, 8%)`,
+//   30: `hsl(${grayHue}, 15%, 15%)`,
+//   40: `hsl(${grayHue}, 13%, 25%)`,
+//   50: `hsl(${grayHue}, 7%, 35%)`,
+//   60: `hsl(${grayHue}, 7%, 70%)`,
+//   70: `hsl(${grayHue}, 9%, 80%)`,
+//   80: `hsl(${grayHue}, 5%, 90%)`,
+//   90: `hsl(${grayHue}, 3%, 95%)`
+// }
+function easeInOutSine(x: number): number {
+  return -(Math.cos(Math.PI * x) - 1) / 2
 }
+const genGrays = () => {
+  const grays = {}
+  for (let i = 0; i < 100; i = i + 5) {
+    grays[i] = `hsl(${grayHue}, 10%, ${(i / 95) * 100}%)`
+  }
+  return grays
+}
+const grays = genGrays()
 const genShades = (hue: number) => {
   return {
     10: `hsl(${hue}, 45%, 8%)`,
@@ -195,8 +207,8 @@ const genShades = (hue: number) => {
 }
 const primaries = genShades(181)
 const colors = {
-  textPrimary: grays[90],
-  textInverse: grays[30],
+  textPrimary: grays[95],
+  textInverse: grays[5],
   successColor: 'hsl(164, 98%, 35%)',
   failureColor: 'hsl(340, 70%, 52%)',
   failureLight: 'hsl(348, 100%, 72%)',
@@ -293,6 +305,7 @@ export const c = {
   minHeight,
   size,
   selfCenter,
+  selfStretch,
   selfStart,
   selfEnd,
   alignStart,

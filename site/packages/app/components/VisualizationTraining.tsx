@@ -89,7 +89,8 @@ const fetchNewPuzzle = async ({
     let response = await client.post('/api/v2/tactic', {
       maxPly,
       ratingGte,
-      ratingLte
+      ratingLte,
+      playerRatingGte: 1600
     })
     // @ts-ignore
     console.log(response.data.count)
@@ -102,15 +103,13 @@ const fetchNewPuzzle = async ({
 
 enum PuzzleDifficulty {
   Beginner = 'Beginner',
-  Novice = 'Novice',
   Intermediate = 'Intermediate',
-  Expert = 'Hard',
+  Expert = 'Expert',
   Magnus = 'Magnus'
 }
 
 const allDifficulties = [
   PuzzleDifficulty.Beginner,
-  PuzzleDifficulty.Novice,
   PuzzleDifficulty.Intermediate,
   PuzzleDifficulty.Expert,
   PuzzleDifficulty.Magnus
@@ -120,8 +119,6 @@ const getPuzzleDifficultyRating = (pd: PuzzleDifficulty) => {
   switch (pd) {
     case PuzzleDifficulty.Beginner:
       return 0
-    case PuzzleDifficulty.Novice:
-      return 800
     case PuzzleDifficulty.Intermediate:
       return 1200
     case PuzzleDifficulty.Expert:
@@ -210,12 +207,12 @@ export const VisualizationTraining = () => {
   let [solutionMoves, setSolutionMoves] = useImmer([] as Move[])
   let [ratingGte, setRatingGte] = useStorageState(
     localStorage,
-    'puzzle-rating-gte',
+    'puzzle-rating-gte-v2',
     PuzzleDifficulty.Beginner
   )
   let [ratingLte, setRatingLte] = useStorageState(
     localStorage,
-    'puzzle-rating-lte',
+    'puzzle-rating-lte-v2',
     PuzzleDifficulty.Intermediate
   )
   const fetchOptions = useMemo(() => {
@@ -848,9 +845,9 @@ export const VisualizationTraining = () => {
             }}
           />
           <Spacer height={24} />
-          <SettingsTitle text={'Rating'} />
+          <SettingsTitle text={'Difficulty'} />
           <Spacer height={12} />
-          <View style={s(c.row, c.ml(12))}>
+          <View style={s(c.row, c.ml(0))}>
             <View style={s(c.column)}>
               <Text style={s(ratingTitleStyles)}>Min</Text>
               <Spacer height={12} />
@@ -865,7 +862,7 @@ export const VisualizationTraining = () => {
                   }
                 }}
                 renderChoice={(c) => {
-                  return <Text>{getPuzzleDifficultyRating(c)}</Text>
+                  return <Text>{`${c} (${getPuzzleDifficultyRating(c)})`}</Text>
                 }}
               />
             </View>
@@ -884,7 +881,7 @@ export const VisualizationTraining = () => {
                   }
                 }}
                 renderChoice={(c) => {
-                  return <Text>{getPuzzleDifficultyRating(c)}</Text>
+                  return <Text>{`${c} (${getPuzzleDifficultyRating(c)})`}</Text>
                 }}
               />
             </View>

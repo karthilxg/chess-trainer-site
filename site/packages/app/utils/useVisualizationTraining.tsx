@@ -454,6 +454,18 @@ export const useVisualizationTraining = ({
   scoreChangeView,
   onSuccess,
   onResetClimb
+}: {
+  mockPassFail?: boolean
+  onFail?: () => void
+  autoPlay?: boolean
+  isClimb?: boolean
+  puzzleDifficultySetting?: number
+  numberMovesHiddenSetting?: number
+  onAutoPlayEnd?: () => void
+  score?: number
+  scoreChangeView?: JSX.Element
+  onSuccess?: () => void
+  onResetClimb?: () => void
 }) => {
   biref.attemptSolution = (move: Move) => {
     updateState((s) => {

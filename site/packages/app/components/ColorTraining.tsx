@@ -33,6 +33,7 @@ import { sample } from 'lodash'
 import { Square } from '@lubert/chess.ts/dist/types'
 import useStateRef from 'react-usestateref'
 import { useEffectWithPrevious } from '../utils/useEffectWithPrevious'
+import { useStateUpdaterV2 } from '../utils/useImmer'
 
 const Tile = ({ color, onPress }) => {
   return (
@@ -40,7 +41,7 @@ const Tile = ({ color, onPress }) => {
   )
 }
 const testPlayingUI = false
-const Score = ({ score, text }) => {
+export const Score = ({ score, text }) => {
   return (
     <View style={s(c.column, c.alignCenter)}>
       <Text style={s(c.fg(c.grays[70]), c.caps, c.weightBold, c.fontSize(12))}>
@@ -59,9 +60,19 @@ export const ColorTraining = () => {
   const biref: ChessboardBiref = useMemo(() => {
     return {}
   }, [])
+  const chessState = useStateUpdaterV2({})
   const [isPlaying, setIsPlaying] = useState(false)
   const [startTime, setStartTime] = useState(null)
   const [score, setScore] = useState(0)
+  // const stateTest = useStateUpdaterV2({ test: 0 })
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     stateTest.update((s) => {
+  //       s.test = s.test + 2
+  //     })
+  //   }, 2000)
+  // }, [])
+  // console.log({ stateTest })
   const [lastRoundScore, setLastRoundScore] = useState(null)
   const [highScore, setHighScore] = useStorageState(
     localStorage,
@@ -128,22 +139,6 @@ export const ColorTraining = () => {
     setPenalties(0)
     setRemainingTime(0)
   }
-  useEffectWithPrevious(
-    (_i, _p, remainingTimePrevious) => {
-      if (isPlaying) {
-        // if (remainingTimePrevious.current === 0) {
-        // }
-        // widthAnim.setValue(1.0)
-        // console.log('remainingTimePrevious', remainingTimePrevious)
-        // Animated.timing(widthAnim, {
-        //   toValue: 0.0,
-        //   duration: remainingTimeRef.current,
-        //   useNativeDriver: false
-        // })
-      }
-    },
-    [isPlaying, penalties]
-  )
   const guessColor = useCallback(
     (color: 'light' | 'dark') => {
       let correct = chess.squareColor(currentSquare) == color
@@ -180,6 +175,7 @@ export const ColorTraining = () => {
         <ChessboardView
           {...{
             biref,
+            state: chessState,
             hideColors: true
           }}
         />

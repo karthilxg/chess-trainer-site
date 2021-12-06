@@ -1,1 +1,0 @@
-http://localhost:8040/lichess_oauth_success?code=liu_9u9M2RIgPgPQKp4TjbJGHt00aJ4e8wr4&state=EREbochcQEpKc9e27WAqhQ

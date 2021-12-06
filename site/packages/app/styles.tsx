@@ -103,9 +103,11 @@ const flexWrap = keyedProp('flexWrap')('wrap')
 
 const display = keyedProp('display')
 const displayFlex = keyedProp('display')('flex')
+const displayNone = keyedProp('display')('none')
 const displayGrid = keyedProp('display')('grid')
 
 const row = s(displayFlex, keyedProp('flexDirection')('row'))
+const gap = keyedProp('gap')
 const column = s(displayFlex, keyedProp('flexDirection')('column'))
 const absolute = keyedProp('position')('absolute')
 const relative = keyedProp('position')('relative')
@@ -134,7 +136,8 @@ const round = keyedPixelProp('borderRadius')(999)
 const flexible = s(
   keyedProp('flexBasis')(0),
   keyedProp('minWidth')(0),
-  keyedProp('minHeight')(0)
+  keyedProp('minHeight')(0),
+  grow
 )
 const fontSize = keyedPixelProp('fontSize')
 
@@ -208,11 +211,12 @@ const genShades = (hue: number) => {
 const primaries = genShades(181)
 const colors = {
   textPrimary: grays[95],
+  textSecondary: grays[85],
   textInverse: grays[5],
   successColor: 'hsl(164, 98%, 35%)',
   failureColor: 'hsl(340, 70%, 52%)',
   failureLight: 'hsl(348, 100%, 72%)',
-  buttonSecondary: 'hsl(215, 35%, 95%)',
+  buttonSecondary: 'hsl(181, 15%, 80%)',
   backgroundColor: grays[10],
   header: 'hsl(229, 19%, 14%)',
   modalColor: 'hsl(229, 10%, 90%)',
@@ -266,6 +270,7 @@ const buttons = {
 
 export const c = {
   keyedProp,
+  displayNone,
   caps,
   p,
   pt,
@@ -323,6 +328,7 @@ export const c = {
   displayFlex,
   displayGrid,
   row,
+  gap,
   column,
   absolute,
   relative,

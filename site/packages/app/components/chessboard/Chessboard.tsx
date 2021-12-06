@@ -26,23 +26,51 @@ import { Chess, PieceSymbol, SQUARES } from '@lubert/chess.ts'
 import {
   forEach,
   isEmpty,
+  isNil,
   cloneDeep,
   takeRight,
   first,
   map,
   mapValues,
   isEqual,
-  indexOf
+  indexOf,
+  drop
 } from 'lodash'
 import { useImmer } from 'use-immer'
 import { LichessPuzzle } from 'app/models'
 import client from 'app/client'
 import { Spacer } from 'app/Space'
 import { Move, Square } from '@lubert/chess.ts/dist/types'
-import { ChessboardBiref } from 'app/types/ChessboardBiref'
+import { ChessboardBiref, ChessboardState } from 'app/types/ChessboardBiref'
 import { useEffectWithPrevious } from 'app/utils/useEffectWithPrevious'
 import { useComponentLayout } from 'app/utils/useComponentLayout'
 import { ChessColor } from 'app/types/Chess'
+import {
+  UpdatadableState,
+  useStateUpdater,
+  useStateUpdaterV2
+} from '../../utils/useImmer'
+
+const animatedXYToPercentage = (x) => {
+  return s(
+    c.top(
+      x.y.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0%', '100%']
+      })
+    ),
+    c.left(
+      x.x.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0%', '100%']
+      })
+    )
+  )
+}
+
+const cloneBoard = (board: Chess): Chess => {
+  return new Chess(board.fen())
+}
 
 export enum PlaybackSpeed {
   Slow = 0,
@@ -152,54 +180,107 @@ export const getAnimationDurations = (playbackSpeed: PlaybackSpeed) => {
 export const ChessboardView = ({
   hideColors,
   playbackSpeed = PlaybackSpeed.Normal,
-  currentPosition,
-  futurePosition,
-  flipped = false,
-  showFuturePosition = false,
   biref,
+  state,
+  styles,
   frozen = false
 }: {
   hideColors?: boolean
   playbackSpeed?: PlaybackSpeed
-  currentPosition?: Chess
-  futurePosition?: Chess
-  flipped?: boolean
-  showFuturePosition?: boolean
   frozen?: boolean
+  state?: ChessboardState
+  styles?: any
   biref: ChessboardBiref
 }) => {
   // @ts-ignore
   let [{ height: chessboardSize }, onChessboardLayout] = useComponentLayout()
+  const { futurePosition, currentPosition, flipped, showFuturePosition } = state
+  // debugger
   chessboardSize = chessboardSize ?? 500 // just for first render
   const tileStyles = s(c.bg('green'), c.grow)
   let [availableMoves, setAvailableMoves] = useState([] as Move[])
   biref.setAvailableMoves = setAvailableMoves
+  // biref.state = state
+  let [animatedMovesQueue, setAnimatedMovesQueue] = useImmer([] as Move[])
+  const [laggingPosition, setLaggingPosition] = useState(null as Chess)
+  biref.animateMove = useCallback(
+    (move) => {
+      // TODO: make animation work better
+      return null
+      if (isNil(laggingPosition)) {
+        setLaggingPosition((laggingPosition) => {
+          let lp = cloneBoard(futurePosition)
+          lp.move(move)
+          return lp
+        })
+      }
+      setAnimatedMovesQueue((s) => [...s, move])
+    },
+    [animatedMovesQueue, futurePosition]
+  )
+  const currentAnimatedMove = animatedMovesQueue[0]
+  const animatedMoveAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current
+  useEffect(() => {
+    if (currentAnimatedMove) {
+      animatedMoveAnim.setValue(getSquareOffset(currentAnimatedMove.from))
+      Animated.sequence([
+        Animated.timing(animatedMoveAnim, {
+          toValue: getSquareOffset(currentAnimatedMove.to),
+          duration: 300,
+          useNativeDriver: false,
+          easing: Easing.inOut(Easing.ease)
+        })
+      ]).start(() => {
+        setAnimatedMovesQueue((s) => {
+          if (s[1]) {
+            laggingPosition.move(s[1])
+          } else {
+            setLaggingPosition(null)
+          }
+          return drop(s, 1)
+        })
+      })
+    }
+  }, [currentAnimatedMove])
+  useEffect(() => {
+    let id = window.setInterval(() => {}, 500)
+    return () => {
+      window.clearInterval(id)
+    }
+  }, [])
 
   const getSquareOffset = useCallback(
-    (square: string) => {
+    (square: string, flippedOverride?: boolean) => {
+      let flippedSot = flippedOverride !== undefined ? flippedOverride : flipped
       const [file, rank] = square
       let x = indexOf(columns, file)
       let y = 7 - indexOf(rows, parseInt(rank))
-      if (flipped) {
+      if (flippedSot) {
         x = 7 - x
         y = 7 - y
       }
-      return { x: (x / 8) * chessboardSize, y: (y / 8) * chessboardSize }
+      return { x: x / 8, y: y / 8 }
     },
     [chessboardSize, flipped]
   )
-  const moveAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current
+  const moveIndicatorAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current
   const [moveIndicatorColor, setMoveIndicatorColor] = useState(null)
   const moveIndicatorOpacityAnim = useRef(new Animated.Value(0)).current
   biref.highlightMove = useCallback(
-    (move: Move, backwards = false, callback: () => void) => {
+    (
+      move: Move,
+      backwards = false,
+      callback: () => void,
+      flipped?: boolean
+    ) => {
+      // TODO: use own flipped value, but it gets outdated right now, so passing it in.
       let { fadeDuration, moveDuration, stayDuration } =
         getAnimationDurations(playbackSpeed)
       setMoveIndicatorColor(
         move.color == 'b' ? c.hsl(180, 15, 10, 80) : c.hsl(180, 15, 100, 80)
       )
       let [start, end] = backwards ? [move.to, move.from] : [move.from, move.to]
-      moveAnim.setValue(getSquareOffset(start))
+      moveIndicatorAnim.setValue(getSquareOffset(start, flipped))
       Animated.sequence([
         Animated.timing(moveIndicatorOpacityAnim, {
           toValue: 1.0,
@@ -208,8 +289,8 @@ export const ChessboardView = ({
           easing: Easing.inOut(Easing.ease)
         }),
         Animated.delay(stayDuration),
-        Animated.timing(moveAnim, {
-          toValue: getSquareOffset(end),
+        Animated.timing(moveIndicatorAnim, {
+          toValue: getSquareOffset(end, flipped),
           duration: moveDuration,
           useNativeDriver: false,
           easing: Easing.inOut(Easing.ease)
@@ -223,7 +304,7 @@ export const ChessboardView = ({
         })
       ]).start(callback)
     },
-    [chessboardSize, flipped, playbackSpeed]
+    [flipped, playbackSpeed]
   )
   // TODO: maybe remove
   const squareHighlightAnims = useMemo(() => {
@@ -283,11 +364,17 @@ export const ChessboardView = ({
     }
   })
   const hiddenColorsBorder = `1px solid ${c.grays[70]}`
+  let position = showFuturePosition ? futurePosition : currentPosition
+  useEffect(() => {
+    if (laggingPosition) {
+      // window.laggingPosition = laggingPosition
+    }
+  }, [laggingPosition?.fen])
 
   const { width: windowWidth } = useWindowDimensions()
   return (
     <View
-      style={s(c.pb('100%'), c.height(0), c.width('100%'))}
+      style={s(c.pb('100%'), c.height(0), c.width('100%'), styles)}
       // @ts-ignore
       onLayout={onChessboardLayout}
     >
@@ -315,7 +402,7 @@ export const ChessboardView = ({
             c.absolute,
             c.center,
             c.opacity(moveIndicatorOpacityAnim),
-            moveAnim.getLayout()
+            animatedXYToPercentage(moveIndicatorAnim)
           )}
         >
           <View
@@ -340,6 +427,75 @@ export const ChessboardView = ({
           )}
           pointerEvents="none"
         ></Animated.View>
+        {Object.keys(SQUARES).map((sq) => {
+          let pos = laggingPosition ?? position
+          let piece = null
+          if (pos) {
+            piece = pos.get(sq)
+          }
+          let layout = {}
+          if (currentAnimatedMove && currentAnimatedMove.to === sq) {
+            // layout = animatedXYToPercentage(currentAnimatedMove)
+          }
+
+          let posStyles = s(
+            c.top(`${getSquareOffset(sq).y * 100}%`),
+            c.left(`${getSquareOffset(sq).x * 100}%`)
+          )
+          let pieceView = null
+          if (piece) {
+            pieceView = (
+              <Animated.View
+                style={s(
+                  c.fullWidth,
+                  c.absolute,
+                  posStyles,
+                  c.zIndex(1),
+                  c.size('12.5%'),
+                  layout
+                )}
+                pointerEvents="none"
+              >
+                <PieceView piece={piece['type']} color={piece['color']} />
+              </Animated.View>
+            )
+          }
+          let moveIndicatorView = null
+          let availableMove = availableMoves.find((m) => m.to == sq)
+          if (availableMove) {
+            moveIndicatorView = (
+              <Animated.View
+                style={s(
+                  c.fullWidth,
+                  c.absolute,
+                  posStyles,
+                  c.zIndex(2),
+                  c.center,
+                  c.size('12.5%'),
+                  layout
+                )}
+                pointerEvents="none"
+              >
+                <View
+                  style={s(
+                    c.size('30%'),
+                    c.opacity(40),
+                    c.round,
+                    c.bg('black'),
+                    c.absolute,
+                    c.zIndex(4)
+                  )}
+                />
+              </Animated.View>
+            )
+          }
+          return (
+            <>
+              {pieceView}
+              {moveIndicatorView}
+            </>
+          )
+        })}
         <View style={s(c.column, c.fullWidth, c.fullHeight)}>
           {times(8)((i) => {
             return (
@@ -357,16 +513,7 @@ export const ChessboardView = ({
                   if (flipped) {
                     square = `${columns[7 - j]}${rows[i]}` as Square
                   }
-                  let position = showFuturePosition
-                    ? futurePosition
-                    : currentPosition
                   let piece = position?.get(square)
-                  let pieceView = null
-                  if (piece) {
-                    pieceView = (
-                      <PieceView piece={piece['type']} color={piece['color']} />
-                    )
-                  }
                   let availableMove = availableMoves.find((m) => m.to == square)
                   const isBottomEdge = i == 7
                   const isRightEdge = j == 7
@@ -387,12 +534,12 @@ export const ChessboardView = ({
                           )
                       )}
                       onPress={() => {
-                        if (!futurePosition && !currentPosition) {
-                          return
-                        }
                         if (availableMove) {
                           setAvailableMoves([])
                           biref.attemptSolution(availableMove)
+                          return
+                        }
+                        if (!futurePosition) {
                           return
                         }
                         let moves = futurePosition.moves({
@@ -421,31 +568,6 @@ export const ChessboardView = ({
                           c.zIndex(4)
                         )}
                       ></Animated.View>
-                      {availableMove &&
-                        (availableMove.captured ? (
-                          <View
-                            style={s(
-                              c.size('30%'),
-                              c.opacity(40),
-                              c.round,
-                              c.bg('black'),
-                              c.absolute,
-                              c.zIndex(4)
-                            )}
-                          />
-                        ) : (
-                          <View
-                            style={s(
-                              c.size('30%'),
-                              c.opacity(40),
-                              c.round,
-                              c.bg('black'),
-                              c.absolute,
-                              c.zIndex(4)
-                            )}
-                          />
-                        ))}
-                      <View style={s(c.fullWidth)}>{pieceView}</View>
                     </Pressable>
                   )
                 })}

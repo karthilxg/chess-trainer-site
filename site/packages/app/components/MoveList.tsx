@@ -17,13 +17,11 @@ import { Move } from '@lubert/chess.ts'
 export const MoveList = ({
   moveList,
   focusedMoveIndex,
-  onMoveClick,
-  onHideNotation
+  onMoveClick
 }: {
   moveList: Move[]
   focusedMoveIndex?: number
   onMoveClick: (move: Move, _: number) => void
-  onHideNotation: () => void
 }) => {
   let pairs = []
   let currentPair = []
@@ -58,6 +56,7 @@ export const MoveList = ({
   )
   return (
     <View style={s(c.column, c.bg(c.grays[20]), c.br(2))}>
+      <View style={s(c.height(1), c.bg(c.grays[30]))} />
       {pairs.map((pair, i) => {
         const [{ move: whiteMove, i: whiteI }, { move: blackMove, i: blackI }] =
           pair
@@ -118,27 +117,6 @@ export const MoveList = ({
           </View>
         )
       })}
-      <View style={s(c.height(1), c.bg(c.grays[30]))} />
-      <Pressable
-        style={s(c.center, c.selfCenter, c.fullWidth, c.py(12))}
-        onPress={() => {
-          onHideNotation()
-        }}
-      >
-        <Text style={s(c.fg(c.colors.textPrimary), c.weightBold)}>
-          <i
-            style={s(c.fg(c.colors.textPrimary), c.opacity(30), c.fontSize(16))}
-            className={`fas fa-angle-up`}
-          ></i>
-          <Spacer width={8} />
-          Hide notation
-          <Spacer width={8} />
-          <i
-            style={s(c.fg(c.colors.textPrimary), c.opacity(30), c.fontSize(16))}
-            className={`fas fa-angle-up`}
-          ></i>
-        </Text>
-      </Pressable>
     </View>
   )
 }

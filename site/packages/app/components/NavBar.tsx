@@ -15,12 +15,16 @@ import { useIsMobile } from '../utils/isMobile'
 
 const navItems = [
   {
+    path: '/the_climb',
+    title: 'The Climb'
+  },
+  {
     path: '/',
-    title: 'Visualization Trainer'
+    title: 'Visualization'
   },
   {
     path: '/color_trainer',
-    title: 'Color Trainer'
+    title: 'Colors'
   }
 ]
 export const NavBar = (props: {}) => {

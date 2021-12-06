@@ -24,11 +24,7 @@ export function useStateUpdater<T>(
       modifiableCopy.current = cloneDeep(vRef.current)
       newState = modifiableCopy.current
     }
-    if (f[Symbol.toStringTag] === 'AsyncFunction') {
-      await f(newState)
-    } else {
-      f(newState)
-    }
+    await f(newState)
     setV(newState)
     vRef.current = newState
     if (shouldClearCopy) {

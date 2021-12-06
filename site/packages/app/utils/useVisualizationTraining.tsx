@@ -518,7 +518,6 @@ export const useVisualizationTraining = ({
     }
   } as VisualizationState)
   const { chessState } = state
-  console.log('Puzzle difficulty', state.puzzleDifficultySetting)
 
   const isMobile = useIsMobile()
   useEffect(() => {

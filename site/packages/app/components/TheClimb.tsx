@@ -120,7 +120,7 @@ const updateStep = (state: State) => {
   state.step = state.climb[state.score.value]
 }
 const DEFAULT_STATE = {
-  isPlaying: true,
+  isPlaying: false,
   // TODO: bring back intro screen
   climb: CLIMB,
   score: new StorageItem('climb-score', 0),
@@ -252,13 +252,14 @@ export const TheClimb = () => {
             {...chessboardProps}
             styles={!state.isPlaying && c.displayNone}
           />
-          {/* <ChessboardView */}
-          {/*   {...{ */}
-          {/*     currentPosition: new Chess(), */}
-          {/*     biref: {}, */}
-          {/*     styles: state.isPlaying && c.displayNone */}
-          {/*   }} */}
-          {/* /> */}
+          <ChessboardView
+            {...{
+              currentPosition: new Chess(),
+              biref: {},
+              state: { currentPosition: new Chess() },
+              styles: state.isPlaying && c.displayNone
+            }}
+          />
         </>
       }
     >

@@ -143,7 +143,11 @@ export const PieceView = ({
   piece: PieceSymbol
   color: ChessColor
 }) => {
-  return <View>{getIconForPiece(piece, color)}</View>
+  return (
+    <View style={s(c.fullWidth, c.fullHeight)}>
+      {getIconForPiece(piece, color)}
+    </View>
+  )
 }
 
 const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
